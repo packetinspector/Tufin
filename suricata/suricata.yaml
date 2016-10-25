@@ -225,7 +225,7 @@ outputs:
         # bi-directional flows
         - flow
         # uni-directional flows
-        #- netflow
+        - netflow
 
   # alert output for use with Barnyard2
   - unified2-alert:
@@ -558,7 +558,7 @@ af-packet:
     # Warning: 'checksum-validation' must be set to yes to have any validation
     #checksum-checks: kernel
     # BPF filter to apply to this interface. The pcap filter syntax apply here.
-    #bpf-filter: port 80 or udp
+    bpf-filter: src net 192.168.0.0/16 and dst net 192.168.0.0/16
     # You can use the following variables to activate AF_PACKET tap or IPS mode.
     # If copy-mode is set to ips or tap, the traffic coming to the current
     # interface will be copied to the copy-iface interface. If 'tap' is set, the

@@ -3,7 +3,10 @@ Suricata Misc
 
 Suricata Config
 --------
-Included a sample config of suricata for flow tracking.  Only flows are sent to eve.json.  Pay close attention to the bpf filter, it's how you narrow down the flows you want to record
+Included a sample config of suricata for flow tracking.  Only flows are sent to eve.json.  Pay close attention to the bpf filter, it's how you narrow down the flows you want to record:
+```
+bpf-filter: src net 192.168.0.0/16 and dst net 192.168.0.0/16
+```
 
 Flow Parser
 --------
