@@ -1,0 +1,63 @@
+<html>
+<head>
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/ju/dt-1.10.12/b-1.2.2/datatables.min.css"/>
+    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/humanity/jquery-ui.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/v/ju/dt-1.10.12/b-1.2.2/datatables.min.js"></script>
+    <script type="text/javascript" src="usp.js"></script>
+    <style>
+        label, input { display:block; margin: 5px;}
+        input.text { margin-bottom:12px; width:95%; padding: .4em; }
+        fieldset { padding:5px; border:0; margin-top:10px; }
+        td.type_0 { background: rgb(247, 247, 247); }
+        td.type_0 { background: repeating-linear-gradient(45deg,#000000,
+          #000000 1px,
+          rgb(247, 247, 247) 1px,
+          rgb(247, 247, 247) 15px ); }
+        td.type_1 { background: repeating-linear-gradient(45deg,#ffffff,
+          #ffffff 2px,
+          #aaaaaa 5px,
+          #aaaaaa 15px ); }
+        td.type_2 { background: rgb(132, 187, 120); }
+        td.type_3 { background: rgb(202, 100, 59); }
+        .misc { font-weight: bold; text-align: center; }
+    </style>
+
+</head>
+
+<body>
+
+<table id="uspgrid" class="cell-border"></table>
+<div id="detailsDialog">
+<form id="detailsForm">
+<fieldset>
+    <label for="zonetype">Zone Type</label>
+    <select name="zonetype" id="zonetype"></select>
+    <label for="severity">Severity</label>
+    <select name="severity" id="severity"></select>
+    <label for="flow_types">Flow Types</label>
+    <select name="flow_types" id="flow_types"></select>
+    <label for="rule_props">Rule Properties (Multiple Select)</label>
+    <select name="rule_props" id="rule_props" multiple="multiple" size="5"></select>
+    <label for="services">Services (Enter services delimited by ";")</label>
+    <textarea id="services" name="services" style="width: 330px; height: 75px;"></textarea>
+</fieldset>
+</form>
+</div>
+<div id="nameDialog">
+<form id="nameForm">
+<fieldset>
+    <label for="zone_name">Zone Name</label>
+    <input type="text" size="20" id="zone_name" name="zone_name">
+</fieldset>
+</form>
+</div>
+
+<button id="add_zone">Add Zone</button>
+<button id="export">Export to CSV</button>
+<br><p>Domain:<input type="text" id="default_domain" name="default_domain" value="Default"></p>
+<br><h4>Instructions</h4><p>Click on the Zone names on the left to rename. Click on cells to modify policy. CSV
+is generated as you make changes or hit the button.</p>
+<br><p>CSV Output<textarea id="output" name="output" style="width: 100%;height: 500px"></textarea>
+</html>
