@@ -1,4 +1,4 @@
-USP Generator
+USP Generator and Editor
 ================
 
 Available in hosted form via CodePen: http://codepen.io/packetinspector/full/PbYpXL/
@@ -17,10 +17,15 @@ var number_of_zones = 3;
 
 Features to add
 - Import Zone Names
-- Import existing USP to edit
+- ~~Import existing USP to edit~~
 - Better input of services
 - Validate Service list
 - Add/Remove Zones dynamically
+
+Note: Does not currently support the number attributes of rule properties (Days, Count).  They are all normalized to "X", please update that yourself for now if it is in use.
+
+Tips: You can keep the edit dialog box open and click cells to edit. You'll still need to save if you make a change though.
+
 
 If you like containers you could host this easily if needed
 

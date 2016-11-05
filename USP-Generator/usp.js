@@ -5,10 +5,10 @@ $(function() {
     var current_cell;
 //Structure for zone props
     var zone_types = [
-    'Allow all',
-    'Block all',
-    'Allow only',
-    'Block only'
+    'allow all',
+    'block all',
+    'allow only',
+    'block only'
     ];
 
     var flow_types = [
@@ -29,10 +29,10 @@ $(function() {
         'EXPLICIT_SERVICE',
         'HAS_COMMENT',
         'IS_LOGGED',
-        'LAST_HIT_WITHIN {DAYS: X}',
-        'SOURCE_MAX_IP {COUNT:X}',
-        'DESTINATION_MAX_IP {COUNT:X}',
-        'SERVICE_MAX_SERVICES {COUNT:X}'
+        'LAST_HIT_WITHIN {days:X}',
+        'SOURCE_MAX_IP {count:X}',
+        'DESTINATION_MAX_IP {count:X}',
+        'SERVICE_MAX_SERVICES {count:X}'
     ];
 
     var usp_skel = {
@@ -159,63 +159,6 @@ $(function() {
         //console.log(usp_table.columns)
     }
 
-    //Create initial Data and column definition
-    col = [{ title: 'From/To', width: 50, className: "ui-state-default sorting_disabled misc" }];
-    table_data = [];
-    cols = [];
-
-    for(i=1; i < number_of_zones+1; i++) {
-        n = 'Zone ' + (i);
-        col.push({title: n});
-        //Make a row default objects
-        row = Array(number_of_zones).fill(JSON.stringify(usp_skel));
-        //Prepend column index
-        row.unshift(n);
-        //Add to data arrays
-        table_data.push(row);
-        cols.push(i);
-    }        
-    
-    //Setup DataTables
-    //Using a render to show ZoneType instead of JSON string.
-    var usp_table = $('#uspgrid').DataTable( {
-        //data: [['Zone 1', '', '',''],['Zone 2', '', '',''],['Zone 3','','','']],
-        //columns: [ { title: 'From/To', width: 50 }, {title: 'Zone 1', width: 200}, {title: 'Zone 2', width: 200}, {title: 'Zone 3', width: 200}],
-        data: table_data,
-        columns: col,
-        "paging": false,
-        "ordering": false,
-        "info": false,
-        "searching": false,
-        "columnDefs": [ {
-            "targets": cols,
-            "render": function (data, type, full, meta) {
-                        if ( type === 'display' && data) {
-                            o = JSON.parse(data);
-                            //console.log(meta);
-                            return "<b>" + zone_types[o.zonetype] + "</b>"
-                    } else {
-                        return data
-                    }
-                    }
-                }]
-    })
-
-    //Click on cells to edit
-    $('#uspgrid tr td:not(:first-child)').on("click", function() {
-        //console.log(this);
-        current_cell = usp_table.cell(this);
-        showDetailsDialog(this);
-    })
-
-    //Click on Headers to Edit
-    $('#uspgrid tr td:first-child').on("click", function() {
-        //console.log(this);
-        current_cell = usp_table.cell(this);
-        idx = usp_table.row(this).index();
-        showRenameDialog(this);
-    })
-
     //Make buttons into buttons
     $('button').button();
 
@@ -233,13 +176,72 @@ $(function() {
         make_csv();
     });
 
+    $("#import_button").on("click", function() {
+        import_csv($("#output").val());
+    });
+
     function import_csv (uspstuff) {
-        //First we need to destroy existing table
-
         //Now we parse the text
-        lines = uspstuff.split("\n");
+        lines = uspstuff.trim().split("\n");
+        //We don't need the row header
+        lines.splice(0,1);
+        //Number of zones
+        nz = Math.sqrt(lines.length);
+        if (!Number.isInteger(nz)) {
+            alert('Error in CSV');
+        }
+        two_d = lines.map(function(line) {
+            return line.replace(/\"/g,"").split(",");
+        })
+        //I'd like to trust the CSV is in order but...
+        from_cols = two_d.map(function(value,index) { return value[1]; });
+        to_cols = two_d.map(function(value,index) { return value[3]; });
+        //Find the uniques and assign them a position
+        unique_from = Array.from(new Set(from_cols));
+        //Now we build the datatable array
+        dt_cols = [{ title: 'From/To', width: 50, className: "ui-state-default sorting_disabled misc" }];
+        dt_rows = [];
+        //Array of column numbers 1->nz
+        dt_render_cols = [];
+        for (i=1; i<nz+1; i++) {
+            //No need to get fancy, we already need to loop
+            dt_render_cols.push(i);
+            dt_cols.push({title: unique_from[i-1]});
+            row = Array(nz).fill('');
+            row.unshift(unique_from[i-1]);
+            dt_rows.push(row);
+        }
+        //Now all the rows
+        two_d.forEach(function(item, index) {
+            //Line up the row/col for entry
+            //console.log(item);
+            row = unique_from.indexOf(item[1]);
+            col = unique_from.indexOf(item[3]) + 1;
+            //console.log(row,col);
+            temp_skel = usp_skel;
+            temp_skel.zonetype = zone_types.indexOf(item[5]) || 0;
+            temp_skel.severity = severity.indexOf(item[4]) || 0;
+            temp_skel.services = item[6];
+            temp_skel.flow_types = flow_types.indexOf(item[8]);
+            //No support for number fields, normallize with regex first
+            nr = item[7].replace(/\:\d+\}/g, ":X}");
+            temp_skel.rule_props = nr.split(";").map(function(value, index) { return rule_props.indexOf(value);});
+            dt_rows[row][col] = JSON.stringify(temp_skel);
 
+        });
 
+        
+
+        console.log("Importing " + nz + " Zones");
+        console.log(two_d);
+        console.log(from_cols);
+        console.log(to_cols);
+        console.log(unique_from);
+        console.log("New Fill");
+        console.log(dt_render_cols,dt_cols,dt_rows);
+        //Reinit
+        init(dt_rows,dt_cols, dt_render_cols, false)
+        
     }
 
     //Loop through data cells and output csv into textarea
@@ -279,6 +281,88 @@ $(function() {
 
         })
     }
+
+
+    function init(dt_rows,dt_cols, dt_render_cols, first=true) {
+        //All done now we remake the table
+        if (!first) {
+            usp_table.destroy();
+        }
+        $('#uspgrid').empty();
+        //Setup DataTables
+        //Using a render to show ZoneType instead of JSON string.
+        usp_table = $('#uspgrid').DataTable( {
+            //data: [['Zone 1', '', '',''],['Zone 2', '', '',''],['Zone 3','','','']],
+            //columns: [ { title: 'From/To', width: 50 }, {title: 'Zone 1', width: 200}, {title: 'Zone 2', width: 200}, {title: 'Zone 3', width: 200}],
+            data: dt_rows,
+            columns: dt_cols,
+            "paging": false,
+            "ordering": false,
+            "info": false,
+            "searching": false,
+            "columnDefs": [ {
+                "targets": dt_render_cols,
+                "render": function (data, type, full, meta) {
+                            if ( type === 'display' && data) {
+                                o = JSON.parse(data);
+                                //console.log(meta);
+                                return "<b>" + zone_types[o.zonetype] + "</b>"
+                        } else {
+                            return data
+                        }
+                        }
+                }]
+        });
+            //Click on cells to edit
+        $('#uspgrid tr td:not(:first-child)').on("click", function() {
+            //console.log(this);
+            current_cell = usp_table.cell(this);
+            showDetailsDialog(this);
+        });
+
+        //Click on Headers to Edit
+        $('#uspgrid tr td:first-child').on("click", function() {
+            //console.log(this);
+            current_cell = usp_table.cell(this);
+            idx = usp_table.row(this).index();
+            showRenameDialog(this);
+        
+        });
+
+        //Color rows
+        $('#uspgrid tr td:not(:first-child)').each(function() {
+            //console.log(this);
+            current_cell = usp_table.cell(this);
+            fd = JSON.parse(current_cell.data());
+            //Color Cell
+            $(current_cell.node()).removeClass("type_0 type_1 type_2 type_3").addClass('type_' + fd.zonetype);
+        });
+
+    }
+
+    var usp_table;
+    //Create initial Data and column definition
+    col = [{ title: 'From/To', width: 50, className: "ui-state-default sorting_disabled misc" }];
+    table_data = [];
+    cols = [];
+
+    for(i=1; i < number_of_zones+1; i++) {
+        n = 'Zone ' + (i);
+        col.push({title: n});
+        //Make a row default objects
+        row = Array(number_of_zones).fill(JSON.stringify(usp_skel));
+        //Prepend column index
+        row.unshift(n);
+        //Add to data arrays
+        table_data.push(row);
+        cols.push(i);
+    }        
+    console.log("Original Fill");
+    console.log(cols);
+    console.log(col);
+    console.log(table_data);
+    //Go for it
+    init(table_data, col, cols);
 
     //Make a tool tip to see entered data
     $( document ).tooltip({
