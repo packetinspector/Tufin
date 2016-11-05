@@ -161,17 +161,18 @@ $(function() {
 
     //Create initial Data and column definition
     col = [{ title: 'From/To', width: 50, className: "ui-state-default sorting_disabled misc" }];
-    dat = [];
+    table_data = [];
     cols = [];
 
     for(i=1; i < number_of_zones+1; i++) {
         n = 'Zone ' + (i);
         col.push({title: n});
-        temp = [n]
-        for(j=0; j < number_of_zones; j++) {
-            temp.push(JSON.stringify(usp_skel));
-        }
-        dat.push(temp);
+        //Make a row default objects
+        row = Array(number_of_zones).fill(JSON.stringify(usp_skel));
+        //Prepend column index
+        row.unshift(n);
+        //Add to data arrays
+        table_data.push(row);
         cols.push(i);
     }        
     
@@ -180,7 +181,7 @@ $(function() {
     var usp_table = $('#uspgrid').DataTable( {
         //data: [['Zone 1', '', '',''],['Zone 2', '', '',''],['Zone 3','','','']],
         //columns: [ { title: 'From/To', width: 50 }, {title: 'Zone 1', width: 200}, {title: 'Zone 2', width: 200}, {title: 'Zone 3', width: 200}],
-        data: dat,
+        data: table_data,
         columns: col,
         "paging": false,
         "ordering": false,
@@ -231,6 +232,15 @@ $(function() {
     $("#export").on("click", function() {
         make_csv();
     });
+
+    function import_csv (uspstuff) {
+        //First we need to destroy existing table
+
+        //Now we parse the text
+        lines = uspstuff.split("\n");
+
+
+    }
 
     //Loop through data cells and output csv into textarea
     function make_csv () {
