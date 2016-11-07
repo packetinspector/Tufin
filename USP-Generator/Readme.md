@@ -21,7 +21,7 @@ Features to add
 - ~~Import existing USP to edit~~
 - Better input of services
 - Validate Service list
-- Add/Remove Zones dynamically
+- ~~Add~~/Remove Zones dynamically
 
 Note: Does not currently support the number attributes of rule properties (Days, Count).  They are all normalized to "X", please update that yourself for now if it is in use.
 

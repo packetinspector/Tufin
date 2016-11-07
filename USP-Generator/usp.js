@@ -165,11 +165,9 @@ $(function() {
     //Not working yet
     $("#add_zone").on("click", function() {
         //console.log("adding zone");
-        usp_table.row.add(['New Zone','','','']).draw();
-        $("#uspgrid thead tr").append("<th>Test</th>");
-        usp_table.draw();
-        //console.log(usp_table.columns)
-    }).hide();
+        make_csv();
+        import_csv($("#output").val(), true);
+    }).show();
 
     //Give the button a purpose
     $("#export").on("click", function() {
@@ -180,7 +178,7 @@ $(function() {
         import_csv($("#output").val());
     });
 
-    function import_csv (uspstuff) {
+    function import_csv (uspstuff, add_new=false) {
         //Now we parse the text
         lines = uspstuff.trim().split("\n");
         //We don't need the row header
@@ -240,7 +238,23 @@ $(function() {
         console.log("New Fill");
         console.log(dt_render_cols,dt_cols,dt_rows);
         //Reinit
+        //init(dt_rows,dt_cols, dt_render_cols, false);
+        if (add_new) {
+            //Add a new zone while where at it
+            new_name = 'New Zone ' + (nz+1);
+            new_zone = new Array(nz).fill(JSON.stringify(usp_skel));
+            new_zone.unshift(new_name);
+            dt_rows.push(new_zone);
+            console.log(dt_rows);
+            dt_cols.push({title: new_name});
+            //Fill in the blank zone
+            dt_rows.map(function(value, index) { return value.push(JSON.stringify(usp_skel));})            
+            dt_render_cols.push(nz+1);
+
+            }
+
         init(dt_rows,dt_cols, dt_render_cols, false)
+
         
     }
 
