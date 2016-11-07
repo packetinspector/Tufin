@@ -401,6 +401,7 @@ $(function() {
                 s = 'From: <b>' + from_z + '</b> To: <b>' + to_z + '</b><br>';
                 s = s + 'Zone Type: ' + zone_types[cd.zonetype] + '<br>';
                 s = s + 'Severity: ' + severity[cd.severity] + '<br>';
+                s = s + 'Rule Properties:' + cd.rule_props.map(function (i) { return rule_props[i];}).join(",") + '<br>';
                 s = s + 'Services: ' + cd.services + '<br>';
                 return s
             } else {
