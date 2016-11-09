@@ -182,7 +182,7 @@ $(function() {
     });
 
     $("#get_usps").on("click", function () {
-        $.getJSON( "https://192.168.200.99/securetrack/api/security_policies/", function(data) {
+        $.getJSON( "/securetrack/api/security_policies/", function(data) {
               console.log( "success" );
               console.log(data);
               console.log(data.SecurityPolicyList.securityPolicies.securityPolicy);
