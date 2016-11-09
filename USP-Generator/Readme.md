@@ -10,6 +10,8 @@ http://codepen.io/packetinspector/pen/PbYpXL
 This is all client side JS. No server neeed to run.  
 You can drag the index.html to your browser or simply use the hosted version.
 
+If you want to use the API functions you'll need to upload this to the ST server due to CORS. 
+
 To change the number of zones edit the variable at the top of the JS:
 ```javascript
 var number_of_zones = 3;
@@ -17,10 +19,11 @@ var number_of_zones = 3;
 
 Features to add
 - Import Zone Names
-- Import an existing USP via API directly
+- ~~Import an existing USP via API directly~~
 - ~~Import existing USP to edit~~
 - Better input of services
 - Validate Service list
+- ~~Prevent duplicate Zone names on rename~~
 - ~~Add~~/Remove Zones dynamically
 
 Note: Does not currently support the number attributes of rule properties (Days, Count).  They are all normalized to "X", please update that yourself for now if it is in use.

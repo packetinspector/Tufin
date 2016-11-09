@@ -17,11 +17,13 @@
            #ffffff 15px ); }
         td.type_1 { background: repeating-linear-gradient(45deg,#000000,
           #000000 1px,
-          #515151 3px,
+         #515151 3px,
           #515151 12px );}
         td.type_2 { background: rgb(132, 187, 120); }
         td.type_3 { background: rgb(202, 100, 59); }
         .misc { font-weight: bold; text-align: center; }
+        td { font-family: "Segoe UI", Tahoma, sans-serif; font-size: 12px; text-align: center; }
+        /*table.dataTable thead th, table.dataTable thead td {padding: 5px 2px; font-family: "Segoe UI", Tahoma, sans-serif; font-size:12px;}*/
     </style>
 
 </head>
@@ -57,6 +59,7 @@
 <button id="add_zone">Add Zone</button>
 <button id="import_button">Import CSV</button>
 <button id="export">Export CSV</button>
+<p><button id="get_usps">Fetch USPs</button><select id="usp_list"><option>Fetch USPs First</option></select><br>Requires server installation</p>
 <br><p>Domain:<input type="text" id="default_domain" name="default_domain" value="Default"></p>
 <br><h4>Instructions</h4><p>Click on the Zone names on the left to rename. Click on cells to modify policy. CSV
 is generated as you make changes or hit the button.

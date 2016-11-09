@@ -107,14 +107,21 @@ $(function() {
             },
             buttons: {"Rename": function() {
                 //Get name from form
-                nn = $("#zone_name").val()
-                //Update Cell
-                current_cell.data(nn);
-                //Find corresponding column and update
-                idx = current_cell.index();
-                idx = idx.row + 1;
-                $(usp_table.column(idx).header()).text(nn);
-                make_csv();
+                nn = $("#zone_name").val();
+                if ($('th').map(function () { return $(this).text(); }).get().indexOf(nn) > 0) {
+                    //Name in Use
+                    alert('Name in use. Try again.');
+                    $("#zone_name").addClass("error");
+                } else {
+                    //Update Cell
+                    current_cell.data(nn);
+                    //Find corresponding column and update
+                    idx = current_cell.index();
+                    idx = idx.row + 1;
+                    $(usp_table.column(idx).header()).text(nn);
+                    make_csv();
+                    $( this ).dialog( "close" );
+                }
             }}
     });
 
@@ -172,6 +179,36 @@ $(function() {
     //Give the button a purpose
     $("#export").on("click", function() {
         make_csv();
+    });
+
+    $("#get_usps").on("click", function () {
+        $.getJSON( "https://192.168.200.99/securetrack/api/security_policies/", function(data) {
+              console.log( "success" );
+              console.log(data);
+              console.log(data.SecurityPolicyList.securityPolicies.securityPolicy);
+              //Clear select
+              $('#usp_list').empty();
+              $('#usp_list').append($("<option></option>").attr("value",0).text("Choose USP"));
+              data.SecurityPolicyList.securityPolicies.securityPolicy.forEach(function(item, index) {   
+                    $('#usp_list').append($("<option></option>").attr("value",item.id).text(item.name)); 
+                });
+            })
+          .fail(function() {
+            alert( "Failed to Fetch USPs" );
+          });
+    });
+
+    $('#usp_list').change(function() {
+        //console.log(this);
+        //console.log($(this).find('option:selected').attr("value"));
+        usp_id = $(this).find('option:selected').attr("value");
+        $.get('/securetrack/api/security_policies/' + usp_id + '/export', function(data) {
+            //console.log(data);
+            $("#output").val(data);
+            import_csv($("#output").val());
+        }).fail(function() {
+            alert("Failed to Fetch USP");
+        });
     });
 
     $("#import_button").on("click", function() {
@@ -356,7 +393,7 @@ $(function() {
 
     var usp_table;
     //Create initial Data and column definition
-    col = [{ title: 'From/To', width: 50, className: "ui-state-default sorting_disabled misc" }];
+    col = [{ title: 'From/To', width: "100px", className: "ui-state-default sorting_disabled misc" }];
     table_data = [];
     cols = [];
 
