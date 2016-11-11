@@ -419,6 +419,7 @@ $(function() {
     $( document ).tooltip({
         items: "td",
         track: true,
+        classes: { "ui-tooltip" : "ruleprops"},
         content: function() {
             //
             idx = usp_table.row(this).index();
@@ -438,7 +439,11 @@ $(function() {
                 s = 'From: <b>' + from_z + '</b> To: <b>' + to_z + '</b><br>';
                 s = s + 'Zone Type: ' + zone_types[cd.zonetype] + '<br>';
                 s = s + 'Severity: ' + severity[cd.severity] + '<br>';
-                s = s + 'Rule Properties:' + cd.rule_props.map(function (i) { return rule_props[i];}).join(",") + '<br>';
+                if (cd.rule_props[0] == 0) {
+                    s = s + 'Rule Properties: None<br>';
+                } else {
+                    s = s + 'Rule Properties: <li>' + cd.rule_props.map(function (i) { return rule_props[i];}).join("<li>") + '<br>';
+                }
                 s = s + 'Services: ' + cd.services + '<br>';
                 return s
             } else {
