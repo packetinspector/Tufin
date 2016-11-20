@@ -18,11 +18,11 @@ var number_of_zones = 3;
 ```
 
 Features to add
-- Import Zone Names
+- ~~Import Zone Names~~
 - ~~Import an existing USP via API directly~~
 - ~~Import existing USP to edit~~
-- Better input of services
-- Validate Service list
+- ~~Better input of services~~
+- ~~Validate Service list~~
 - ~~Prevent duplicate Zone names on rename~~
 - ~~Add~~/Remove Zones dynamically
 

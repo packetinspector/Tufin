@@ -1,5 +1,6 @@
 <html>
 <head>
+    <meta charset="UTF-8">
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/ju/dt-1.10.12/b-1.2.2/datatables.min.css"/>
     <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/humanity/jquery-ui.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
@@ -24,7 +25,78 @@
         .misc { font-weight: bold; text-align: center; }
         td { font-family: "Segoe UI", Tahoma, sans-serif; font-size: 12px; text-align: center; }
         .ruleprops { font-family: "Segoe UI", Tahoma, sans-serif; font-size: 14px; }
+        p.server_functions {border-style: inset; border-color: orange; width: 400px; padding: 10px;}
         /*table.dataTable thead th, table.dataTable thead td {padding: 5px 2px; font-family: "Segoe UI", Tahoma, sans-serif; font-size:12px;}*/
+        ul.tagit {
+            padding: 1px 5px;
+            overflow: auto;
+            margin-left: inherit; /* usually we don't want the regular ul margins. */
+            margin-right: inherit;
+        }
+        ul.tagit li {
+            display: block;
+            float: left;
+            margin: 2px 5px 2px 0;
+        }
+        ul.tagit li.tagit-choice {    
+            position: relative;
+            line-height: inherit;
+        }
+        input.tagit-hidden-field {
+            display: none;
+        }
+        ul.tagit li.tagit-choice-read-only { 
+            padding: .2em .5em .2em .5em; 
+        } 
+
+        ul.tagit li.tagit-choice-editable { 
+            padding: .2em 18px .2em .5em; 
+        } 
+
+        ul.tagit li.tagit-new {
+            padding: .25em 4px .25em 0;
+        }
+
+        ul.tagit li.tagit-choice a.tagit-label {
+            cursor: pointer;
+            text-decoration: none;
+        }
+        ul.tagit li.tagit-choice .tagit-close {
+            cursor: pointer;
+            position: absolute;
+            right: .1em;
+            top: 50%;
+            margin-top: -8px;
+            line-height: 17px;
+        }
+
+        /* used for some custom themes that don't need image icons */
+        ul.tagit li.tagit-choice .tagit-close .text-icon {
+            display: none;
+        }
+
+        ul.tagit li.tagit-choice input {
+            display: block;
+            float: left;
+            margin: 2px 5px 2px 0;
+        }
+        ul.tagit input[type="text"] {
+            -moz-box-sizing:    border-box;
+            -webkit-box-sizing: border-box;
+            box-sizing:         border-box;
+
+            -moz-box-shadow: none;
+            -webkit-box-shadow: none;
+            box-shadow: none;
+
+            border: none;
+            margin: 0;
+            padding: 0;
+            width: inherit;
+            background-color: inherit;
+            outline: none;
+        }
+
     </style>
 
 </head>
@@ -43,8 +115,10 @@
     <select name="flow_types" id="flow_types"></select>
     <label for="rule_props">Rule Properties (Multiple Select)</label>
     <select name="rule_props" id="rule_props" multiple="multiple" size="5"></select>
-    <label for="services">Services (Enter services delimited by ";")</label>
-    <textarea id="services" name="services" style="width: 330px; height: 75px;"></textarea>
+    <!-- <label for="services">Services (Enter services delimited by ";")</label>
+    <textarea id="services" name="services" style="width: 330px; height: 75px;"></textarea> -->
+    <label for="services_tags">Services (Autocomplete or type in)</label>
+    <input name="tags" id="services_tags" value="">
 </fieldset>
 </form>
 </div>
@@ -53,6 +127,7 @@
 <fieldset>
     <label for="zone_name">Zone Name</label>
     <input type="text" size="20" id="zone_name" name="zone_name">
+    <select id="server_zones" name="server_zones"></select>
 </fieldset>
 </form>
 </div>
@@ -60,7 +135,10 @@
 <button id="add_zone">Add Zone</button>
 <button id="import_button">Import CSV</button>
 <button id="export">Export CSV</button>
-<p><button id="get_usps">Fetch USPs</button><select id="usp_list"><option>Fetch USPs First</option></select><br>Requires server installation</p>
+<div id="server_functions_wrapper">
+<p id="server_functions" class="server_functions"><button id="get_usps">Fetch USPs</button><select id="usp_list"><option>Fetch USPs First</option></select><br>
+<br><button id="get_zones">Fetch Zones</button><br><span style="font-weight: bold; font-size: small; margin-bottom: 15px;">These functions require server installation because of <a href="https://en.wikipedia.org/wiki/Same-origin_policy">Same-Origin</a></span></p>
+</div>
 <br><p>Domain:<input type="text" id="default_domain" name="default_domain" value="Default"></p>
 <br><h4>Instructions</h4><p>Click on the Zone names on the left to rename. Click on cells to modify policy. CSV
 is generated as you make changes or hit the button.
