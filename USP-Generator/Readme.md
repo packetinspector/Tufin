@@ -12,7 +12,7 @@ You can drag the index.html to your browser or simply use the hosted version.
 
 If you want to use the API functions you'll need to upload this to the ST server due to CORS. 
 
-TufinOS doesn't have git available so I made an install script. Simply execute the two lines below on the console and the script will appear inthe 
+TufinOS doesn't have git available so I made an install script. Simply execute the two lines below on the console and the script will appear on the tools page.
 
 Server Installation:
 ```shell
@@ -39,7 +39,7 @@ Installation Complete. Visit https://<ip-address>/tools/
 ```
 
 
-To change the number of zones edit the variable at the top of the JS:
+To change the default number of zones for a new USP edit the variable at the top of the JS:
 ```javascript
 var number_of_zones = 3;
 ```
