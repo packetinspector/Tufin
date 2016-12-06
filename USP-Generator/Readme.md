@@ -12,6 +12,33 @@ You can drag the index.html to your browser or simply use the hosted version.
 
 If you want to use the API functions you'll need to upload this to the ST server due to CORS. 
 
+TufinOS doesn't have git available so I made an install script. Simply execute the two lines below on the console and the script will appear inthe 
+
+Server Installation:
+```shell
+curl -L "https://raw.githubusercontent.com/packetinspector/Tufin/master/USP-Generator/install.bash" > install.bash
+bash install.bash
+```
+
+Sample Installation:
+```shell
+[root@TufinOS ~]# curl -L "https://raw.githubusercontent.com/packetinspector/Tufin/master/USP-Generator/install.bash" > install.bash
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+
+[root@TufinOS ~]# bash install.bash
+Downloading Files
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100  5947  100  5947    0     0  18533      0 --:--:-- --:--:-- --:--:-- 80364
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100 29806  100 29806    0     0  97081      0 --:--:-- --:--:-- --:--:--  203k
+Inserting Tools Link
+Installation Complete. Visit https://<ip-address>/tools/
+```
+
+
 To change the number of zones edit the variable at the top of the JS:
 ```javascript
 var number_of_zones = 3;
