@@ -225,6 +225,6 @@ for i in unique_ips:
     create_zone_with_entries(i,[ipre])
 ```
 
-Lots of other ways to use that one....
+Lots of other ways to use that one...
 
 
