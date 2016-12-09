@@ -150,3 +150,60 @@ add_zones_to_flows:
     }
 ]
 ```
+
+##### Create a USP from a flow file
+```python
+def flows_to_usp(fl):
+    #Assume you are calling this after add_zones_to_flows
+
+(unique_ips, unique_services, flows) = parse_flow_file(sys.argv[1])
+sample = flows[0:5]
+print flows_to_usp(add_zones_to_flows(unique_ips, sample))
+```
+###### Example
+```shell
+Flow file found.  Parsing...
+Found 39 unique IPs and 106 unique Services inside 168 flow(s)
+```
+Found 6 matching zones in flows
+Building USP...
+from domain,from zone,to domain,to zone,severity,access type,services,rule properties,flows
+default,192.168.100.2,default,192.168.100.2,low,allow all,,,
+default,192.168.100.2,default,192.168.100.49,low,allow all,,,
+default,192.168.100.2,default,192.168.100.31,low,allow all,,,
+default,192.168.100.2,default,192.168.100.37,low,allow only,UDP 55910,,
+default,192.168.100.2,default,Amsterdam_Ext,low,allow all,,,
+default,192.168.100.2,default,192.168.100.75,low,allow all,,,
+default,192.168.100.49,default,192.168.100.2,low,allow only,UDP 53,,
+default,192.168.100.49,default,192.168.100.49,low,allow all,,,
+default,192.168.100.49,default,192.168.100.31,low,allow all,,,
+default,192.168.100.49,default,192.168.100.37,low,allow all,,,
+default,192.168.100.49,default,Amsterdam_Ext,low,allow all,,,
+default,192.168.100.49,default,192.168.100.75,low,allow all,,,
+default,192.168.100.31,default,192.168.100.2,low,allow all,,,
+default,192.168.100.31,default,192.168.100.49,low,allow all,,,
+default,192.168.100.31,default,192.168.100.31,low,allow all,,,
+default,192.168.100.31,default,192.168.100.37,low,allow all,,,
+default,192.168.100.31,default,Amsterdam_Ext,low,allow all,,,
+default,192.168.100.31,default,192.168.100.75,low,allow all,,,
+default,192.168.100.37,default,192.168.100.2,low,allow all,,,
+default,192.168.100.37,default,192.168.100.49,low,allow all,,,
+default,192.168.100.37,default,192.168.100.31,low,allow all,,,
+default,192.168.100.37,default,192.168.100.37,low,allow all,,,
+default,192.168.100.37,default,Amsterdam_Ext,low,allow all,,,
+default,192.168.100.37,default,192.168.100.75,low,allow all,,,
+default,Amsterdam_Ext,default,192.168.100.2,low,allow all,,,
+default,Amsterdam_Ext,default,192.168.100.49,low,allow all,,,
+default,Amsterdam_Ext,default,192.168.100.31,low,allow all,,,
+default,Amsterdam_Ext,default,192.168.100.37,low,allow all,,,
+default,Amsterdam_Ext,default,Amsterdam_Ext,low,allow only,UDP 55984,,
+default,Amsterdam_Ext,default,192.168.100.75,low,allow all,,,
+default,192.168.100.75,default,192.168.100.2,low,allow all,,,
+default,192.168.100.75,default,192.168.100.49,low,allow all,,,
+default,192.168.100.75,default,192.168.100.31,low,allow all,,,
+default,192.168.100.75,default,192.168.100.37,low,allow all,,,
+default,192.168.100.75,default,Amsterdam_Ext,low,allow all,,,
+default,192.168.100.75,default,192.168.100.75,low,allow all,,,
+```
+
+You could paste this into the [USP Editor](https://github.com/packetinspector/Tufin/tree/master/USP-Generator) if you wanted to.
