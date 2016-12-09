@@ -235,8 +235,19 @@ Lots of other ways to use that one...
 #### Create an entire Unified Security Policy automatically
 
 ```python
-
-
+(unique_ips, unique_services, flows) = parse_flow_file(sys.argv[1])
+baseline = flows[1:6]
+test_sample = flows[1:10]
+for i in unique_ips:
+    ipre = str(i) + '/32'
+    create_zone_with_entries(i,[ipre])
+#Now we have all the zones created...
+#Make a USP
+print flows_to_usp(add_zones_to_flows(unique_ips, baseline))
+#Hopefully we can bypass this manual step...
+raw_input("Add USP to ST then hit Enter to continue...")
+print "Validate flows against USPs:"
+print json.dumps(validate_flows_usp(test_sample, True), indent=4, separators=(',',':'))
 ```
 
 ###### Example
@@ -306,3 +317,4 @@ Validate flows against USPs:
 ]
 ```
 
+![USP in ST](/flow_usp.png)
