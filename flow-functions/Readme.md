@@ -317,4 +317,5 @@ Validate flows against USPs:
 ]
 ```
 
-![USP in ST](/flow_usp.png)
+![USP in ST](/flow-functions/flow_usp.png)
+
