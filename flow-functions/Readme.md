@@ -230,3 +230,79 @@ for i in unique_ips:
 Lots of other ways to use that one...
 
 
+###What can I do with this?
+
+#### Create an entire Unified Security Policy automatically
+
+```python
+
+
+```
+
+###### Example
+```shell
+$ python gogo.py ./flows.json
+Flow file found.  Parsing...
+Found 39 unique IPs and 106 unique Services inside 168 flow(s)
+Found 6 matching zones in flows
+Building USP...
+from domain,from zone,to domain,to zone,severity,access type,services,rule properties,flows
+default,192.168.100.2,default,192.168.100.2,low,allow all,,,
+default,192.168.100.2,default,192.168.100.49,low,allow all,,,
+default,192.168.100.2,default,192.168.100.31,low,allow all,,,
+default,192.168.100.2,default,192.168.100.37,low,allow only,UDP 55910,,
+default,192.168.100.2,default,192.168.100.76,low,allow all,,,
+default,192.168.100.2,default,192.168.100.75,low,allow all,,,
+default,192.168.100.49,default,192.168.100.2,low,allow only,UDP 53,,
+default,192.168.100.49,default,192.168.100.49,low,allow all,,,
+default,192.168.100.49,default,192.168.100.31,low,allow all,,,
+default,192.168.100.49,default,192.168.100.37,low,allow all,,,
+default,192.168.100.49,default,192.168.100.76,low,allow all,,,
+default,192.168.100.49,default,192.168.100.75,low,allow all,,,
+default,192.168.100.31,default,192.168.100.2,low,allow all,,,
+default,192.168.100.31,default,192.168.100.49,low,allow all,,,
+default,192.168.100.31,default,192.168.100.31,low,allow all,,,
+default,192.168.100.31,default,192.168.100.37,low,allow all,,,
+default,192.168.100.31,default,192.168.100.76,low,allow all,,,
+default,192.168.100.31,default,192.168.100.75,low,allow all,,,
+default,192.168.100.37,default,192.168.100.2,low,allow all,,,
+default,192.168.100.37,default,192.168.100.49,low,allow all,,,
+default,192.168.100.37,default,192.168.100.31,low,allow all,,,
+default,192.168.100.37,default,192.168.100.37,low,allow all,,,
+default,192.168.100.37,default,192.168.100.76,low,allow all,,,
+default,192.168.100.37,default,192.168.100.75,low,allow all,,,
+default,192.168.100.76,default,192.168.100.2,low,allow only,UDP 53,,
+default,192.168.100.76,default,192.168.100.49,low,allow all,,,
+default,192.168.100.76,default,192.168.100.31,low,allow all,,,
+default,192.168.100.76,default,192.168.100.37,low,allow all,,,
+default,192.168.100.76,default,192.168.100.76,low,allow all,,,
+default,192.168.100.76,default,192.168.100.75,low,allow all,,,
+default,192.168.100.75,default,192.168.100.2,low,allow all,,,
+default,192.168.100.75,default,192.168.100.49,low,allow all,,,
+default,192.168.100.75,default,192.168.100.31,low,allow all,,,
+default,192.168.100.75,default,192.168.100.37,low,allow all,,,
+default,192.168.100.75,default,192.168.100.76,low,allow all,,,
+default,192.168.100.75,default,192.168.100.75,low,allow all,,,
+
+Add USP to ST then hit Enter to continue...
+Validate flows against USPs:
+[
+    {
+        "service":"53",
+        "proto":"UDP",
+        "proto_num":17,
+        "src_ip":"192.168.100.2",
+        "dst_ip":"192.168.100.37",
+        "violations":[
+            {
+                "src_zone":"192.168.100.2",
+                "type":"restricted_matrix_cell_violation",
+                "severity":"LOW",
+                "dst_zone":"192.168.100.37",
+                "USP":"FlowFile"
+            }
+        ]
+    }
+]
+```
+
