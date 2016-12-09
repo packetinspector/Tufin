@@ -29,6 +29,17 @@ These are a series of python functions you can use with flow files.  Flow files 
 
 You can generate them anyway you want.  Or perhaps try an [automated approach](https://github.com/packetinspector/Tufin/tree/master/suricata)
 
+##### Parse Zone File
+```python
+def parse_flow_file(file_location):
+    #Parse Flow file
+    #Returns a tuple of: list of unique ips, list of unique services, list of flows
+```
+###### Example
+```shell
+Flow file found.  Parsing...
+Found 39 unique IPs and 106 unique Services inside 168 flow(s)
+```
 
 ##### Validate flows against USP
 ```python
@@ -82,3 +93,14 @@ validate_flows_usp(flows, True)
     }
 ]
 ```
+
+##### Add Zones to Flows
+```python
+def validate_flows_usp(fl, only_return_violations=False):
+    #Input: set of flows
+    #Output: set of flows with USP violations added or just flows with violations
+
+validate_flows_usp(flows, True)
+```
+###### Example
+```shell
