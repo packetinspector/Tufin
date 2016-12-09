@@ -102,6 +102,7 @@ def add_zones_to_flows(unique_ips, fl):
 
 (unique_ips, unique_services, flows) = parse_flow_file(sys.argv[1])
 sample = flows[0:5]
+print "add_zones_to_flows: "
 print json.dumps(add_zones_to_flows(unique_ips, sample), indent=4, separators=(',',':'))
 ```
 ###### Example
@@ -164,7 +165,6 @@ print flows_to_usp(add_zones_to_flows(unique_ips, sample))
 ```shell
 Flow file found.  Parsing...
 Found 39 unique IPs and 106 unique Services inside 168 flow(s)
-```
 Found 6 matching zones in flows
 Building USP...
 from domain,from zone,to domain,to zone,severity,access type,services,rule properties,flows
