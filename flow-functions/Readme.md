@@ -31,3 +31,54 @@ You can generate them anyway you want.  Or perhaps try an [automated approach](h
 
 
 ##### Validate flows against USP
+```python
+def validate_flows_usp(fl, only_return_violations=False):
+    #Input: set of flows
+    #Output: set of flows with USP violations added or just flows with violations
+
+validate_flows_usp(flows, True)
+```
+###### Example
+```shell
+[
+    {
+        "src_zone":"Amsterdam_Ext",
+        "service":"55984",
+        "proto":"UDP",
+        "proto_num":17,
+        "src_ip":"172.16.120.1",
+        "dst_zone":"Amsterdam_Ext",
+        "dst_ip":"172.16.120.2",
+        "violations":[
+            {
+                "src_zone":"Amsterdam_SiteC",
+                "type":"blocked_matrix_cell_violation",
+                "severity":"LOW",
+                "dst_zone":"Amsterdam_SiteC",
+                "USP":"Network AUP"
+            },
+            {
+                "src_zone":"Amsterdam_SiteC",
+                "type":"blocked_matrix_cell_violation",
+                "severity":"HIGH",
+                "dst_zone":"Amsterdam_Ext",
+                "USP":"Corporate Matrix (Physical + AWS)"
+            },
+            {
+                "src_zone":"Amsterdam_Ext",
+                "type":"blocked_matrix_cell_violation",
+                "severity":"HIGH",
+                "dst_zone":"Amsterdam_SiteC",
+                "USP":"Corporate Matrix (Physical + AWS)"
+            },
+            {
+                "src_zone":"Amsterdam_Ext",
+                "type":"blocked_matrix_cell_violation",
+                "severity":"LOW",
+                "dst_zone":"Amsterdam_Ext",
+                "USP":"Network AUP"
+            }
+        ]
+    }
+]
+```
