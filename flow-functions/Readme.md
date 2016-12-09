@@ -234,6 +234,7 @@ Lots of other ways to use that one...
 
 #### Create an entire Unified Security Policy automatically
 
+Sample Code
 ```python
 (unique_ips, unique_services, flows) = parse_flow_file(sys.argv[1])
 baseline = flows[1:6]
@@ -250,7 +251,7 @@ print "Validate flows against USPs:"
 print json.dumps(validate_flows_usp(test_sample, True), indent=4, separators=(',',':'))
 ```
 
-###### Example
+###### Output
 ```shell
 $ python gogo.py ./flows.json
 Flow file found.  Parsing...
