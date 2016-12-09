@@ -107,6 +107,8 @@ print json.dumps(add_zones_to_flows(unique_ips, sample), indent=4, separators=('
 ```
 ###### Example
 ```shell
+Flow file found.  Parsing...
+Found 39 unique IPs and 106 unique Services inside 168 flow(s)
 add_zones_to_flows:
 [
     {
