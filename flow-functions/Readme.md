@@ -207,3 +207,24 @@ default,192.168.100.75,default,192.168.100.75,low,allow all,,,
 ```
 
 You could paste this into the [USP Editor](https://github.com/packetinspector/Tufin/tree/master/USP-Generator) if you wanted to.
+
+##### Create a zone with entries
+```python
+def create_zone_with_entries(zone_name, entries):
+    # Example: create_zone_with_entries('internal_net', ['192.168.100.0/24', '172.26.45.1/32'])
+    # In, Zonename and array of CIDR/s
+    # Create Zone, Add Entries
+    # Return zone id
+```
+###### Example
+```python
+#Add a zone for every IP
+(unique_ips, unique_services, flows) = parse_flow_file(sys.argv[1])
+for i in unique_ips:
+    ipre = str(i) + '/32'
+    create_zone_with_entries(i,[ipre])
+```
+
+Lots of other ways to use that one....
+
+
