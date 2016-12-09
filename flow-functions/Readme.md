@@ -96,11 +96,57 @@ validate_flows_usp(flows, True)
 
 ##### Add Zones to Flows
 ```python
-def validate_flows_usp(fl, only_return_violations=False):
-    #Input: set of flows
-    #Output: set of flows with USP violations added or just flows with violations
+def add_zones_to_flows(unique_ips, fl):
+    # Input: set of flow records
+    # Output: set of flow records with zone_name added to src/dst.  Blank if no zone found
 
-validate_flows_usp(flows, True)
+(unique_ips, unique_services, flows) = parse_flow_file(sys.argv[1])
+sample = flows[0:5]
+print json.dumps(add_zones_to_flows(unique_ips, sample), indent=4, separators=(',',':'))
 ```
 ###### Example
 ```shell
+add_zones_to_flows:
+[
+    {
+        "src_zone":"Amsterdam_Ext",
+        "service":"55984",
+        "proto":"UDP",
+        "src_ip":"172.16.120.1",
+        "dst_zone":"Amsterdam_Ext",
+        "dst_ip":"172.16.120.2"
+    },
+    {
+        "src_zone":"192.168.100.2",
+        "service":"31433",
+        "proto":"UDP",
+        "src_ip":"192.168.100.2",
+        "dst_zone":"192.168.100.31",
+        "dst_ip":"192.168.100.31"
+    },
+    {
+        "src_zone":"192.168.100.49",
+        "service":"53",
+        "proto":"UDP",
+        "src_ip":"192.168.100.49",
+        "dst_zone":"192.168.100.2",
+        "dst_ip":"192.168.100.2"
+    },
+    {
+        "src_zone":"192.168.100.2",
+        "service":"56468",
+        "proto":"UDP",
+        "src_ip":"192.168.100.2",
+        "dst_zone":"192.168.100.75",
+        "dst_ip":"192.168.100.75"
+    },
+    {
+        "src_zone":"192.168.100.2",
+        "service":"55910",
+        "proto":"UDP",
+        "src_ip":"192.168.100.2",
+        "dst_zone":"192.168.100.37",
+        "dst_ip":"192.168.100.37"
+    }
+]
+```
