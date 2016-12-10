@@ -29,7 +29,7 @@ These are a series of python functions you can use with flow files.  Flow files 
 
 You can generate them anyway you want.  Maybe [convert an APG](https://github.com/packetinspector/Tufin/tree/master/apg2flows) or perhaps try an [automated approach](https://github.com/packetinspector/Tufin/tree/master/suricata)
 
-##### Parse Zone File
+##### Parse Flow File
 ```python
 def parse_flow_file(file_location):
     #Parse Flow file
@@ -98,7 +98,7 @@ validate_flows_usp(flows, True)
 ```python
 def add_zones_to_flows(unique_ips, fl):
     # Input: set of flow records
-    # Output: set of flow records with zone_name added to src/dst.  Blank if no zone found
+    # Output: Queries SecureTrack and adds zone names to a set of flow records. Blank if no zone found.  
 
 (unique_ips, unique_services, flows) = parse_flow_file(sys.argv[1])
 sample = flows[0:5]
@@ -157,7 +157,8 @@ add_zones_to_flows:
 ##### Create a USP from a flow file
 ```python
 def flows_to_usp(fl):
-    #Assume you are calling this after add_zones_to_flows
+    # Create a USP assuming the flow records represent allowed traffic.  Defaults can be easily modified.
+    # Assume you are calling this after add_zones_to_flows
 
 (unique_ips, unique_services, flows) = parse_flow_file(sys.argv[1])
 sample = flows[0:5]
@@ -214,7 +215,7 @@ You could paste this into the [USP Editor](https://github.com/packetinspector/Tu
 ```python
 def create_zone_with_entries(zone_name, entries):
     # Example: create_zone_with_entries('internal_net', ['192.168.100.0/24', '172.26.45.1/32'])
-    # In, Zonename and array of CIDR/s
+    # In, Zonename and list of CIDR/s
     # Create Zone, Add Entries
     # Return zone id
 ```
