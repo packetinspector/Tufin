@@ -41,6 +41,47 @@ Flow file found.  Parsing...
 Found 39 unique IPs and 106 unique Services inside 168 flow(s)
 ```
 
+##### Validate flows against topology
+```python
+def validate_flows_topology(fl):
+    # Input: list of flows
+    # Output: list of flow with topology information added
+
+print "validate with topology: "
+print json.dumps(validate_flows_topology(test_sample), indent=4, separators=(',',':'))
+```
+###### Example
+```shell
+Flow file found.  Parsing...
+Found 40 unique IPs and 106 unique Services inside 168 flow(s)
+validate with topology:
+[
+    {
+        "src_ip":"172.16.120.1",
+        "dst_ip":"172.16.120.2",
+        "traffic_allowed":true,
+        "service":"55984",
+        "proto":"UDP"
+    },
+    {
+        "traffic_allowed":false,
+        "service":"443",
+        "proto":"TCP",
+        "devices":[
+            "Generic02",
+            "Pe_1",
+            "RTR6",
+            "RTR4",
+            "FG-SITE-B",
+            "FG-External",
+            "SMCPM"
+        ],
+        "src_ip":"172.16.130.1",
+        "dst_ip":"172.16.140.2"
+    }
+]
+```
+
 ##### Validate flows against USP
 ```python
 def validate_flows_usp(fl, only_return_violations=False):
