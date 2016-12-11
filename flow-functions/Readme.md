@@ -27,7 +27,7 @@ These are a series of python functions you can use with flow files.  Flow files 
 }
 ```
 
-You can generate them anyway you want.  Maybe [convert an APG](https://github.com/packetinspector/Tufin/tree/master/apg2flows) or perhaps try an [automated approach](https://github.com/packetinspector/Tufin/tree/master/suricata)
+You can generate them anyway you want.  Maybe [convert an APG](https://github.com/packetinspector/Tufin/tree/master/apg2flows) , parse firewall logs or perhaps try an [automated approach](https://github.com/packetinspector/Tufin/tree/master/suricata)
 
 ##### Parse Flow File
 ```python
