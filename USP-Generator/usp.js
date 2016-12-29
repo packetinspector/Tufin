@@ -235,6 +235,13 @@ $(function() {
             console.log("success");
             console.log("Found " + data.zones.count + " Zones");
             console.log(data.zones);
+            //Empty the zones to avoid dupes
+            $('#server_zones').empty()
+            //Add zones the user is currently working with
+            $('#uspgrid tr td:first-child').each(function() {
+                $('#server_zones').append($("<option></option>").attr("value",$(this).text()).text($(this).text()));
+            });
+            //Add zones from api
             data.zones.zone.forEach(function(item, index) {   
                 $('#server_zones').append($("<option></option>").attr("value",item.name).text(item.name)); 
             });
