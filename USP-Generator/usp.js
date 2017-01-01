@@ -3,6 +3,7 @@ $(function() {
 
 //Global Var
     var current_cell;
+    var exceptions = {};
 //Structure for zone props
     var zone_types = [
     'allow all',
@@ -41,6 +42,67 @@ $(function() {
         'flow_types': 0,
         'rule_props': [0],
         'services': ''
+    };
+
+    var exc_skel = {
+      "security_policy_exception": {
+          "name": "My Cool Exception TEST",
+          "domain": {
+            "name": "Default"
+          },
+          "expiration_date": "2070-04-01",
+          "exempted_traffic_list": {
+            "exempted_traffic": {
+              "source_network_collection": {
+                "exclude_any": false,
+                "is_any": false,
+                "negate": false,
+                "network_items": {
+                  "network_item": {
+                    "@xsi.type": "subnet",
+                    "ip": "192.168.60.10",
+                    "prefix": "27"
+                  }
+                }
+              },
+              "dest_network_collection": {
+                "exclude_any": false,
+                "is_any": false,
+                "negate": false,
+                "network_items": {
+                  "network_item": {
+                    "@xsi.type": "subnet",
+                    "ip": "172.16.40.40",
+                    "prefix": "32"
+                  }
+                }
+              },
+              "service_collection": {
+                "exclude_any": false,
+                "is_any": false,
+                "negate": false,
+                "service_items": {
+                  "service_item": {
+                    "@xsi.type": "custom",
+                    "port": 443,
+                    "protocol": "tcp"
+                  }
+                }
+              },
+              "comment": "Traffic Comments",
+              "status": "valid",
+              "security_requirements": {
+                "zone_to_zone_security_requirement": {
+                  "from_domain": "Default",
+                  "from_zone": "Cali_bckp-site",
+                  "to_domain": "Default",
+                  "to_zone": "Toronto",
+                  "policy_name": "Corporate Matrix (Physical + AWS)"
+                }
+              }
+            }
+          }
+        }
     };
 
    
@@ -88,15 +150,61 @@ $(function() {
         
     }
 
+    function post_ex() {
+        usp_exception = exc_skel;
+        //Grab Zone Names
+        usp_exception.security_policy_exception.exempted_traffic_list.exempted_traffic.security_requirements.zone_to_zone_security_requirement.to_zone = $(usp_table.column(current_cell.node()).header()).text();
+        usp_exception.security_policy_exception.exempted_traffic_list.exempted_traffic.security_requirements.zone_to_zone_security_requirement.from_zone = $(usp_table.row(current_cell.node()).node()).find('td:eq(0)').text();
+        //Selected USP
+        usp_exception.security_policy_exception.exempted_traffic_list.exempted_traffic.security_requirements.zone_to_zone_security_requirement.policy_name = $('#usp_list').find('option:selected').text();
+        //Form Data
+        usp_exception.security_policy_exception.exempted_traffic_list.exempted_traffic.source_network_collection.network_items.network_item.ip = $('#source_ip').val();
+        usp_exception.security_policy_exception.exempted_traffic_list.exempted_traffic.source_network_collection.network_items.network_item.prefix = $('#source_prefix').find('option:selected').val();
+        usp_exception.security_policy_exception.exempted_traffic_list.exempted_traffic.dest_network_collection.network_items.network_item.ip = $('#dest_ip').val();
+        usp_exception.security_policy_exception.exempted_traffic_list.exempted_traffic.dest_network_collection.network_items.network_item.prefix = $('#dest_prefix').find('option:selected').val();
+        usp_exception.security_policy_exception.name = $('#ex_name').val();
+        usp_exception.security_policy_exception.exempted_traffic_list.exempted_traffic.comment = $('#ex_comment').val();
+
+        console.log(usp_exception);
+        // $.post( "/securetrack/api/security_policies/exceptions", JSON.stringify(usp_exception), 'json').done(function( data ) {
+        //     alert( "Data Loaded: " + data );
+        // }).fail(function() {
+        //     alert( "Failed to add Exception" );
+        // });
+
+        $.ajax({
+          type: "POST",
+          url: "/securetrack/api/security_policies/exceptions",
+          data: JSON.stringify(usp_exception),
+          dataType: 'json',
+          contentType : 'application/json',
+          statusCode: {
+            201: function(r) {
+                alert('Success!');
+                import_exceptions();
+                $("#detailsDialog").dialog( "close" );
+
+            },
+            400: function(r) {
+                //Error
+                message = /\<message\>(.*?)\<\/message\>/.exec(r.responseText);
+                //console.log(message);
+                alert(message[1]);
+            }
+          }
+        })
+    }
+
     //Edit form
     $("#detailsDialog").dialog({
             autoOpen: false,
             width: 500,
             close: function() {
-                form[0].reset();
+                // form[0].reset();
+                document.getElementById('detailsForm').reset();
                 $("#detailsForm").find(".error").removeClass("error");
             },
-            buttons: {"Update": updateCell},
+            // buttons: {"Update": updateCell},
             position: { my: "center", at: "center top", of: window }
     });
     //Name form
@@ -147,7 +255,7 @@ $(function() {
         }
         //console.log(data);
         //Clear select
-        $("select").find('option').prop("selected",false);
+        $("#detailsForm select").find('option').prop("selected",false);
         //Open Form
         $("#detailsDialog").dialog("option", "title", "Zone Edit").dialog("open").dialog( "moveToTop" );
         //Set selected options
@@ -175,6 +283,18 @@ $(function() {
                     singleFieldNode: $("#services_tags")
                 });
         }
+        // Lets look for exceptions
+        $("#ex_list").empty();
+        to = $(usp_table.column(current_cell.node()).header()).text();
+        from = $(usp_table.row(current_cell.node()).node()).find('td:eq(0)').text();
+        ind = from + to;
+        if (exceptions[ind]) {
+            exceptions[ind].forEach(function (item, index) {
+                $("#ex_list").append('<li class="ex" zone="' + ind + '">' + item.name + '</li>');
+            });
+        } else {
+            $("#ex_list").append('<p>None</p>');
+        }
     };
 
     //Show form for zone name edit
@@ -187,6 +307,8 @@ $(function() {
 
     //Make buttons into buttons
     $('button').button();
+    //Make Tabs
+    $( "#tabs" ).tabs({active: 0});
 
     //Now working
     $("#add_zone").on("click", function() {
@@ -198,6 +320,20 @@ $(function() {
     //Give the button a purpose
     $("#export").on("click", function() {
         make_csv();
+    });
+
+    $("#update_zone").on("click", function() {
+        updateCell();
+        $("#detailsDialog").dialog( "close" );
+    });
+
+    $("#add_ex").on("click", function() {
+        post_ex();
+        // $("#detailsDialog").dialog( "close" );
+    });
+
+    $("#reset_ex").on("click", function() {
+        document.getElementById('ex_form').reset();
     });
 
     $("#get_usps").on("click", function () {
@@ -253,6 +389,40 @@ $(function() {
     $("#import_button").on("click", function() {
         import_csv($("#output").val());
     });
+
+    function import_exceptions() {
+        console.log("Fetching Exceptions")
+        exceptions = {};
+        $.getJSON( "/securetrack/api/security_policies/exceptions", function(data) {
+            // console.log(data);
+            if (! Array.isArray(data.security_policy_exception_list.security_policy_exception)) {
+                e = [].concat(data.security_policy_exception_list.security_policy_exception);
+            } else {
+                e = data.security_policy_exception_list.security_policy_exception;
+            }
+            e.forEach(function(item, index) { 
+                console.log(item);
+                // console.log(item.name);
+                g = {};
+                g.name = item.name
+                g.policy_name = item.exempted_traffic_list.exempted_traffic.security_requirements.zone_to_zone_security_requirement.policy_name;
+                g.comment = item.exempted_traffic_list.exempted_traffic.comment;
+                g.create_date = item.creation_date;
+                g.expire_date = item.expiration_date;
+                g.traffic = item.exempted_traffic_list.exempted_traffic;
+                f = item.exempted_traffic_list.exempted_traffic.security_requirements.zone_to_zone_security_requirement.from_zone;
+                t = item.exempted_traffic_list.exempted_traffic.security_requirements.zone_to_zone_security_requirement.to_zone;
+                //console.log(g);
+                ind = f + t;
+                if (! exceptions[ind]) {
+                    exceptions[ind] = [];
+                }
+                exceptions[ind].push(g);
+            });
+        });
+        console.log("Found: ")
+        console.log(exceptions);
+    }
 
     function import_csv (uspstuff, add_new=false) {
         //Now we parse the text
@@ -407,6 +577,8 @@ $(function() {
         $('#uspgrid tr td:not(:first-child)').on("click", function() {
             //console.log(this);
             current_cell = usp_table.cell(this);
+            //Reset EX form
+            //document.getElementById('ex_form').reset();
             showDetailsDialog(this);
         });
 
@@ -425,7 +597,14 @@ $(function() {
             current_cell = usp_table.cell(this);
             fd = JSON.parse(current_cell.data());
             //Color Cell
-            $(current_cell.node()).removeClass("type_0 type_1 type_2 type_3").addClass('type_' + fd.zonetype);
+            $(current_cell.node()).removeClass("type_0 type_1 type_2 type_3 exceptions").addClass('type_' + fd.zonetype);
+            //Grab the zones based on cell
+            to = $(usp_table.column(this).header()).text();
+            from = $(usp_table.row(this).node()).find('td:eq(0)').text();
+            ind = from + to;
+            if (exceptions[ind]) {
+                $(current_cell.node()).addClass('exceptions');
+            }
         });
 
     }
@@ -493,6 +672,50 @@ $(function() {
         }
     });
 
+    function traverse(jsonObj) {
+        if( typeof jsonObj == "object" ) {
+            $.each(jsonObj, function(k,v) {
+                // k is either an array index or object key
+                r = r + '<tr><td>' + k + '</td>';
+                traverse(v);
+                r= r + '</tr>';
+            });
+        }
+            else {
+                // jsonOb is a number or string
+                r = r + '<td>' + jsonObj + '</td>';
+            }
+    }
+
+    $( document ).tooltip({
+        items: "li.ex",
+        track: true,
+        classes: { "ui-tooltip" : "ruleprops"},
+        content: function() {
+            n = $(this).text();
+            i = $(this).attr('zone');
+            //Go through exceptions
+            //
+            // 
+            
+            if (exceptions[i]) {
+                exceptions[i].forEach(function(item, index) {
+                    if (item.name == n) {
+                        found = item;
+                        return;
+                    }
+                });
+                if (found) {
+                    r = '';
+                    traverse(found);
+                    out = '<table>' + r + '</table>';
+                    return out
+                }
+            }
+            return 'No Data'
+        }
+    });
+
     if (document.location.href.includes('file://') || document.location.href.includes('codepen')){
         $("#server_functions_wrapper").hide();
         $("#server_zones").hide();
@@ -503,8 +726,8 @@ $(function() {
         $('#server_zones').change(function() {
             zone_name = $(this).find('option:selected').attr("value");
             $("#zone_name").val(zone_name);
-       
-    });
+        });
+        import_exceptions();
 
     }
 });

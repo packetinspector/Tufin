@@ -25,6 +25,8 @@
         .misc { font-weight: bold; text-align: center; }
         td { font-family: "Segoe UI", Tahoma, sans-serif; font-size: 12px; text-align: center; }
         .ruleprops { font-family: "Segoe UI", Tahoma, sans-serif; font-size: 14px; }
+         td.exceptions {  background-repeat: no-repeat; background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABP0lEQVR4nKWTvW7CMBRGj4NrVGXqRCcqsaGwoEg8CY/Jk7AwRSxd2qlbJivEvx2SEifpgFpPvvnuPffLtS0AqqKI/GEVVSVkVRTxZb/n9XAAYx6rVIqv85kKogRYlSWhqsC5Ick5YtsCIJZLkHLQpGRVltSXCxIgaE1smlGTqDXqdALAHI+IPB9EaxFadyyAYC3B2hEgNA3qx0zTkCk10rM+vwMYg5/8v0+AzloW0/n0sQSI1hImCWkcjEFM9LmDfmD3rkmBMwYmepY68MaMCgB8COP91EEKCG07c+Cd42O7BeApz2cOQh8PgEkHd7vxdr0C8LnbMV0jQGzb2RDTU/DWkmXZSI8pwP/igBh532wAWEg5P+YUABBiJKZXGciE6Fje472/fxfJtZYAuq55Xq+JDz4moRS6rrs9/O85fwOY+st4zY2qywAAAABJRU5ErkJggg==);}
+     
         p.server_functions {border-style: inset; border-color: orange; width: 400px; padding: 10px;}
         /*table.dataTable thead th, table.dataTable thead td {padding: 5px 2px; font-family: "Segoe UI", Tahoma, sans-serif; font-size:12px;}*/
         ul.tagit {
@@ -105,22 +107,57 @@
 
 <table id="uspgrid" class="cell-border"></table>
 <div id="detailsDialog">
-<form id="detailsForm">
-<fieldset>
-    <label for="zonetype">Zone Type</label>
-    <select name="zonetype" id="zonetype"></select>
-    <label for="severity">Severity</label>
-    <select name="severity" id="severity"></select>
-    <label for="flow_types">Flow Types</label>
-    <select name="flow_types" id="flow_types"></select>
-    <label for="rule_props">Rule Properties (Multiple Select)</label>
-    <select name="rule_props" id="rule_props" multiple="multiple" size="5"></select>
-    <!-- <label for="services">Services (Enter services delimited by ";")</label>
-    <textarea id="services" name="services" style="width: 330px; height: 75px;"></textarea> -->
-    <label for="services_tags">Services (Autocomplete or type in)</label>
-    <input name="tags" id="services_tags" value="">
-</fieldset>
-</form>
+    <div id="tabs">
+        <ul>
+            <li><a href="#tabs-1">Zone Info</a></li>
+            <li><a href="#tabs-2">Exceptions</a></li>
+        </ul>
+        <div id="tabs-1">
+            <form id="detailsForm">
+            <fieldset>
+                <label for="zonetype">Zone Type</label>
+                <select name="zonetype" id="zonetype"></select>
+                <label for="severity">Severity</label>
+                <select name="severity" id="severity"></select>
+                <label for="flow_types">Flow Types</label>
+                <select name="flow_types" id="flow_types"></select>
+                <label for="rule_props">Rule Properties (Multiple Select)</label>
+                <select name="rule_props" id="rule_props" multiple="multiple" size="5"></select>
+                <!-- <label for="services">Services (Enter services delimited by ";")</label>
+                <textarea id="services" name="services" style="width: 330px; height: 75px;"></textarea> -->
+                <label for="services_tags">Services (Autocomplete or type in)</label>
+                <input name="tags" id="services_tags" value="">
+            </fieldset>
+                <button id="update_zone">Update Zone</button>
+            </form>
+        </div>
+        <div id="tabs-2">
+        <p>Existing Exceptions(Hover for Details)</p>
+        <div id="ex_list"></div>
+        <div id="ex_add_form">
+            <hr>Add New Exception
+            <form id="ex_form">        
+            <fieldset>
+            <label for="ex_name">Name</label>
+            <input type="text" name="ex_name" id="ex_name" value="" required>
+            <label for="ex_comment">Comment</label>
+            <input type="text" name="ex_comment" id="ex_comment" value="">
+            <label for="source_ip">Source Network</label>
+            <input name="source_ip" id="source_ip" value="" style="display:inline" required>
+            <select name="source_prefix" id="source_prefix"><option value="32">32</option> <option value="31">31</option> <option value="30">30</option> <option value="29">29</option> <option value="28">28</option> <option value="27">27</option> <option value="26">26</option> <option value="25">25</option> <option value="24">24</option> <option value="23">23</option> <option value="22">22</option> <option value="21">21</option> <option value="20">20</option> <option value="19">19</option> <option value="18">18</option> <option value="17">17</option> <option value="16">16</option> <option value="15">15</option> <option value="14">14</option> <option value="13">13</option> <option value="12">12</option> <option value="11">11</option> <option value="10">10</option> <option value="9">9</option> <option value="8">8</option> <option value="7">7</option> <option value="6">6</option> <option value="5">5</option> <option value="4">4</option> <option value="3">3</option> <option value="2">2</option> <option value="1">1</option></select>
+            <label for="dest_ip">Dest Network</label>
+            <input name="dest_ip" id="dest_ip" value="" style="display:inline" required>
+            <select name="dest_prefix" id="dest_prefix"><option value="32">32</option> <option value="31">31</option> <option value="30">30</option> <option value="29">29</option> <option value="28">28</option> <option value="27">27</option> <option value="26">26</option> <option value="25">25</option> <option value="24">24</option> <option value="23">23</option> <option value="22">22</option> <option value="21">21</option> <option value="20">20</option> <option value="19">19</option> <option value="18">18</option> <option value="17">17</option> <option value="16">16</option> <option value="15">15</option> <option value="14">14</option> <option value="13">13</option> <option value="12">12</option> <option value="11">11</option> <option value="10">10</option> <option value="9">9</option> <option value="8">8</option> <option value="7">7</option> <option value="6">6</option> <option value="5">5</option> <option value="4">4</option> <option value="3">3</option> <option value="2">2</option> <option value="1">1</option></select>
+            <label for="service">Service</label>
+            <input type="number" name="port" value="" min="1" max="65536" style="display:inline" required>
+            <select name="proto"><option value="tcp">tcp</option><option value="udp">udp</option><option value="icmp">icmp</option></select> 
+            </fieldset>
+            <button id="add_ex">Add Exception</button>
+            <button id="reset_ex">Reset Form</button>
+            </form>
+        </div>
+        </div>
+    </div>
 </div>
 <div id="nameDialog">
 <form id="nameForm">
@@ -136,7 +173,7 @@
 <button id="import_button">Import CSV</button>
 <button id="export">Export CSV</button>
 <div id="server_functions_wrapper">
-<p id="server_functions" class="server_functions"><button id="get_usps">Fetch USPs</button><select id="usp_list"><option>Fetch USPs First</option></select><br>
+<p id="server_functions" class="server_functions"><button id="get_usps">Fetch USPs</button><select name="usp_list" id="usp_list"><option>Fetch USPs First</option></select><br>
 <br><button id="get_zones">Fetch Zones</button><br><span style="font-weight: bold; font-size: small; margin-bottom: 15px;">These functions require server installation because of <a href="https://en.wikipedia.org/wiki/Same-origin_policy">Same-Origin</a></span></p>
 </div>
 <br><p>Domain:<input type="text" id="default_domain" name="default_domain" value="Default"></p>
