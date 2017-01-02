@@ -6,11 +6,12 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
     <script type="text/javascript" src="https://cdn.datatables.net/v/ju/dt-1.10.12/b-1.2.2/datatables.min.js"></script>
-    <script type="text/javascript" src="usp.js"></script>
+    <script type="text/javascript" src="usp-wizard.js"></script>
     <style>
         label, input { font-family: "Segoe UI", Tahoma, sans-serif; display:block; margin: 5px;}
         input.text { font-family: "Segoe UI", Tahoma, sans-serif; margin-bottom:12px; width:95%; padding: .4em; }
-        fieldset { padding:5px; border:0; margin-top:10px; }
+        fieldset.noborder { padding:5px; border:0; margin-top:10px; }
+        .device_group_class { font-size: small; }
         td.type_0 { background: rgb(247, 247, 247); }
         td.type_0 { background: repeating-linear-gradient(45deg,rgb(247, 247, 247),
           rgb(247, 247, 247) 2px,
@@ -137,6 +138,8 @@
     <button id="get_usps" class="menu_buttons">USPs</button>
     <p class="menu_style" style="float: left;">&nbsp;|&nbsp;</p>
     <button id="get_exceptions" class="menu_buttons">Exceptions</button>
+    <p class="menu_style" style="float: left;">&nbsp;--&nbsp;</p>
+    <button id="wizard_button" class="menu_buttons">Wizard</button>
 </div>
 <div id="online_selections" style="float: left;">
     <p class="menu_style" style="float: left; margin-top: 0px;">&nbsp;Domain&nbsp;&nbsp;</p>
@@ -154,7 +157,7 @@
         </ul>
         <div id="tabs-1">
             <form id="detailsForm">
-            <fieldset>
+            <fieldset class="noborder">
                 <label for="zonetype">Zone Type</label>
                 <select name="zonetype" id="zonetype"></select>
                 <label for="severity">Severity</label>
@@ -177,7 +180,7 @@
         <div id="ex_add_form">
             <hr>Add New Exception
             <form id="ex_form">        
-            <fieldset>
+            <fieldset class="noborder">
             <label for="ex_name">Name</label>
             <input type="text" name="ex_name" id="ex_name" value="" required>
             <label for="ex_comment">Comment</label>
@@ -201,12 +204,19 @@
 </div>
 <div id="nameDialog">
 <form id="nameForm">
-<fieldset>
+<fieldset class="noborder">
     <label for="zone_name">Zone Name</label>
     <input type="text" size="20" id="zone_name" name="zone_name">
     <select id="server_zones" name="server_zones"></select>
 </fieldset>
 </form>
+</div>
+
+<div id="wizard_dialog">
+<div id="device_fetch"><div id="devices_list">Click the button to continue</div><button id="df_button">Load Devices</button><button id="interfaces_button">Load Interfaces</button>
+</div>
+<div id="interface_fetch"><p>Select interfaces. Zones will be created directly into ST via API.</p><div id="interfaces_list"></div><button id="makezones_button">Create Zones</button></div>
+<div id="zone_creation"></div>
 </div>
 
 <div id="instructions">
@@ -216,14 +226,14 @@
  <li>Domains, Zones, USPs and Exceptions are loaded on startup if online. Click the reload button if you want to refresh.
  <li>Enter Domain where you want to create USPs.
  <li>You can start from the suggested clean USP with 3 zones, select an existing Zone from Tufin to edit or import a local USP.
- <li>To import a local USP, just paste its contents in the textarea below and click on <b>Import CSV</b>.
+ <li>To import a local USP, just paste it's contents in the textarea below and click on <b>Import CSV</b>.
  <li>Click on the Zone names on the left to rename.
  <li>Click on cells to modify policy. 
- <li>After finishing your edits, click on <b>Export CSV</b> to generate the USP contents in the textbox.
+ <li>After finising your edits, click on <b>Export CSV</b> to generate the USP contents in the textbox.
  <ul>
   <li>To load the results into Tufin you need to copy and paste all generated contents into a .CSV text file and import into a new or existing USP on <b><nobr>SecureTrack->Audit->Compliance</nobr></b>.
  </ul>
- <li>To import a local USP, just paste its contents on below textarea and then click on <b>Import CSV</b> button.
+ <li>To import a local USP, just paste it's contents on below textarea and then click on <b>Import CSV</b> button.
 </ul>
 Online functions require server installation because of <a href="https://en.wikipedia.org/wiki/Same-origin_policy">Same-Origin</a>
 <h4>Exceptions</h4>

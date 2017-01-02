@@ -210,10 +210,21 @@ $(function() {
             // buttons: {"Update": updateCell},
             position: { my: "center", at: "center top", of: window }
     });
+    $("#wizard_dialog").dialog({
+        autoOpen: false,
+        width: 800,
+        title: 'USP Wizard',
+        close: function() {
+            // form[0].reset();
+            
+        },
+        // buttons: {"Update": updateCell},
+        position: { my: "center", at: "center top", of: window }
+    });
     //Name form
     $("#nameDialog").dialog({
             autoOpen: false,
-            width: 500,
+            width: 800,
             close: function() {
                 form[0].reset();
                 $("#detailsForm").find(".error").removeClass("error");
@@ -351,6 +362,78 @@ $(function() {
         $("#about").toggle();
     });
 
+    $("#wizard_button").on("click", function() {
+        $("#wizard_dialog").dialog( "open" );
+        $("#device_fetch").show();
+        $("#interfaces_button").hide();
+        $("#interface_fetch").hide();
+        
+    });
+
+    $("#df_button").on("click", function() {
+        $("#devices_list").empty();
+        $.getJSON( "/securetrack/api/devices/", function(data) {
+            //Let's add a control group
+            $("#devices_list").append('<fieldset><legend>Devices</legend><div id="devicegroup" class="device_group_class"></div></fieldset>');
+            data.devices.device.forEach(function (item, i) {
+                //console.log(item);
+                $("#devicegroup").append('<label><input type="checkbox" id="device_boxes" value="' + item.id + '" fw_name="' + item.name +'">' + item.name + '(' + item.vendor + ')' + '</label>');
+            });
+            $("#devicegroup").controlgroup({"direction": "horizontal"});
+            $("#devices_list").append('<p>Check the devices you want to use and click load interfaces</p>')
+            //Show Different Button
+            $("#interfaces_button").show();
+
+        });
+    });
+
+    $("#interfaces_button").on("click", function() {
+        $("#interfaces_list").empty();
+        device_ids = $("#device_boxes:checked").map(function () { return this.value}).get();
+        device_names = $("#device_boxes:checked").map(function () { return $(this).attr('fw_name')}).get();
+        console.log(device_ids,device_names);
+        if (device_ids.length) {
+            //We have devices, let's start a new form
+            $("#device_fetch").hide();
+            $("#interface_fetch").show();
+            device_ids.forEach(function(item, index) {
+                console.log(item);
+                $("#interfaces_list").append('<fieldset><legend>' + device_names[index] + '</legend><div id="interfacegroup' + index + '" class="interface_group_class"></div></fieldset>');
+                $.getJSON( `/securetrack/api/devices/${item}/interfaces`, function(data) {
+                    console.log(data);
+                    if (data.interfaces.interface) {
+                        if (data.interfaces.interface.forEach) {
+                            data.interfaces.interface.forEach(function (iface, ifnum) {
+                                if (iface.interface_ips) {
+                                    $('#interfacegroup' + index).append(`<label><input type="checkbox" id="interface_boxes" value="${iface.id}">${iface.interface_ips.interface_ip.ip}/${iface.interface_ips.interface_ip.netmask}</label>`);
+                                }
+                            });
+                        } else {
+                            if (data.interfaces.interface.interface_ips) {
+                                $('#interfacegroup' + index).append(`<label><input type="checkbox" id="interface_boxes" value="${data.interfaces.interface.id}">${data.interfaces.interface.interface_ips.ip}/${iface.interface_ips.interface_ip.netmask}</label>`);
+                            }
+                        }
+                    }
+                    // $("#interfaces_list")
+                    $('#interfacegroup' + index).controlgroup({"direction": "horizontal"});
+                });
+            });
+            $("#interfaces_button").hide();
+            $("#makezones_button").show();
+
+        } else {
+            alert('Select Devices First');
+        }
+
+    });
+
+    $("#makezones_button").on("click", function() {
+        interface_ids = $("#interface_boxes:checked").map(function () { return this.value}).get();
+        console.log(interface_ids);
+        alert('Come back soon');
+    });
+
+
 
     $("#get_usps").on("click", function () {
         $.getJSON( "/securetrack/api/security_policies/", function(data) {
@@ -411,46 +494,44 @@ $(function() {
         exceptions = {};
         $.getJSON( "/securetrack/api/security_policies/exceptions", function(data) {
             // console.log(data);
-            if (data.security_policy_exception_list && data.security_policy_exception_list.security_policy_exception) {
-                if (! Array.isArray(data.security_policy_exception_list.security_policy_exception)) {
-                    e = [].concat(data.security_policy_exception_list.security_policy_exception);
-                } else {
-                    e = data.security_policy_exception_list.security_policy_exception;
-                }
-                e.forEach(function(item, index) { 
-                    console.log(item);
-                    // console.log(item.name);
-                    g = {};
-                    g.name = item.name
-                    g.policy_name = item.exempted_traffic_list.exempted_traffic.security_requirements.zone_to_zone_security_requirement.policy_name;
-                    g.comment = item.exempted_traffic_list.exempted_traffic.comment;
-                    g.create_date = item.creation_date;
-                    g.expire_date = item.expiration_date;
-                    g.traffic = item.exempted_traffic_list.exempted_traffic;
-                    f = item.exempted_traffic_list.exempted_traffic.security_requirements.zone_to_zone_security_requirement.from_zone;
-                    t = item.exempted_traffic_list.exempted_traffic.security_requirements.zone_to_zone_security_requirement.to_zone;
-                    //console.log(g);
-                    ind = f + t;
-                    if (! exceptions[ind]) {
-                        exceptions[ind] = [];
-                    }
-                    exceptions[ind].push(g);
-                });
-
-                 //Refind exceptions
-                $('#uspgrid tr td:not(:first-child)').each(function() {
-                    //console.log(this);
-                    current_cell = usp_table.cell(this);
-                    $(current_cell.node()).removeClass("exceptions");
-                    //Grab the zones based on cell
-                    to = $(usp_table.column(this).header()).text();
-                    from = $(usp_table.row(this).node()).find('td:eq(0)').text();
-                    ind = from + to;
-                    if (exceptions[ind]) {
-                        $(current_cell.node()).addClass('exceptions');
-                    }
-                });
+            if (! Array.isArray(data.security_policy_exception_list.security_policy_exception)) {
+                e = [].concat(data.security_policy_exception_list.security_policy_exception);
+            } else {
+                e = data.security_policy_exception_list.security_policy_exception;
             }
+            e.forEach(function(item, index) { 
+                console.log(item);
+                // console.log(item.name);
+                g = {};
+                g.name = item.name
+                g.policy_name = item.exempted_traffic_list.exempted_traffic.security_requirements.zone_to_zone_security_requirement.policy_name;
+                g.comment = item.exempted_traffic_list.exempted_traffic.comment;
+                g.create_date = item.creation_date;
+                g.expire_date = item.expiration_date;
+                g.traffic = item.exempted_traffic_list.exempted_traffic;
+                f = item.exempted_traffic_list.exempted_traffic.security_requirements.zone_to_zone_security_requirement.from_zone;
+                t = item.exempted_traffic_list.exempted_traffic.security_requirements.zone_to_zone_security_requirement.to_zone;
+                //console.log(g);
+                ind = f + t;
+                if (! exceptions[ind]) {
+                    exceptions[ind] = [];
+                }
+                exceptions[ind].push(g);
+            });
+
+             //Refind exceptions
+            $('#uspgrid tr td:not(:first-child)').each(function() {
+                //console.log(this);
+                current_cell = usp_table.cell(this);
+                $(current_cell.node()).removeClass("exceptions");
+                //Grab the zones based on cell
+                to = $(usp_table.column(this).header()).text();
+                from = $(usp_table.row(this).node()).find('td:eq(0)').text();
+                ind = from + to;
+                if (exceptions[ind]) {
+                    $(current_cell.node()).addClass('exceptions');
+                }
+            });
         });
         // console.log("Found: ")
         // console.log(exceptions);
