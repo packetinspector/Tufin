@@ -12,7 +12,7 @@ You can drag the index.html to your browser or simply use the hosted version.
 
 If you want to use the API functions you'll need to upload this to the ST server due to CORS. 
 
-TufinOS doesn't have git available so I made an install script. Simply execute the two lines below on the console and the script will appear on the tools page.
+TufinOS doesn't have git available so I made an install script. Simply execute the two lines below on the console and the script will appear on the tools page.  You can re-run the installer any time you would like to update the code. 
 
 Server Installation:
 ```shell
