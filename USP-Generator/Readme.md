@@ -45,9 +45,10 @@ var number_of_zones = 3;
 ```
 
 Exceptions
-- View exceptions in-line with your USP
-- Add New Exception
-
+- ~~View exceptions in-line with your USP~~
+- ~~Add New Exception~~
+- Full CRUD
+- Add more options to form
 
 Features to add
 - ~~Import Zone Names~~
