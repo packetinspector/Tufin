@@ -43,6 +43,8 @@ To change the default number of zones for a new USP edit the variable at the top
 ```javascript
 var number_of_zones = 3;
 ```
+####Features
+List of anticipated features.  Strikethroughs are completed.
 
 Exceptions
 - ~~View exceptions in-line with your USP~~
@@ -50,7 +52,7 @@ Exceptions
 - Full CRUD
 - Add more options to form
 
-Features to add
+USP
 - ~~Import Zone Names~~
 - ~~Import an existing USP via API directly~~
 - ~~Import existing USP to edit~~
