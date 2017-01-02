@@ -1,4 +1,7 @@
 $(function() {
+    var usp_editor_version = 'Version 2.0B';
+
+
     var number_of_zones = 3;
 
 //Global Var
@@ -336,6 +339,19 @@ $(function() {
         document.getElementById('ex_form').reset();
     });
 
+    $("#get_exceptions").on("click", function() {
+        import_exceptions();
+    });
+
+    $("#button_inst").on("click", function() {
+        $("#instructions").toggle();
+    });
+
+    $("#button_about").on("click", function() {
+        $("#about").toggle();
+    });
+
+
     $("#get_usps").on("click", function () {
         $.getJSON( "/securetrack/api/security_policies/", function(data) {
               console.log( "success" );
@@ -419,9 +435,23 @@ $(function() {
                 }
                 exceptions[ind].push(g);
             });
+
+             //Refind exceptions
+            $('#uspgrid tr td:not(:first-child)').each(function() {
+                //console.log(this);
+                current_cell = usp_table.cell(this);
+                $(current_cell.node()).removeClass("exceptions");
+                //Grab the zones based on cell
+                to = $(usp_table.column(this).header()).text();
+                from = $(usp_table.row(this).node()).find('td:eq(0)').text();
+                ind = from + to;
+                if (exceptions[ind]) {
+                    $(current_cell.node()).addClass('exceptions');
+                }
+            });
         });
-        console.log("Found: ")
-        console.log(exceptions);
+        // console.log("Found: ")
+        // console.log(exceptions);
     }
 
     function import_csv (uspstuff, add_new=false) {
@@ -716,12 +746,20 @@ $(function() {
         }
     });
 
+    //Display version
+
+    $('#version_text').text(usp_editor_version);
+    $('#about').hide();
+    $('#instructions').hide();
+
     if (document.location.href.includes('file://') || document.location.href.includes('codepen')){
-        $("#server_functions_wrapper").hide();
-        $("#server_zones").hide();
+        $("#online_menu_bar").hide();
+        $("#online_selections").hide();
+        $('#online').hide();
     } else {
-        $("#get_usps").click();
         on_server = true;
+        $("#get_usps").click();
+        $('#offline').hide();
         $("#get_zones").click();
         $('#server_zones').change(function() {
             zone_name = $(this).find('option:selected').attr("value");

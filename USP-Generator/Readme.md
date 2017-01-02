@@ -1,4 +1,4 @@
-USP Generator and Editor
+USP Generator and Editor w/ Exceptions!
 ================
 
 Available in hosted form via CodePen: http://codepen.io/packetinspector/full/PbYpXL/
@@ -43,6 +43,11 @@ To change the default number of zones for a new USP edit the variable at the top
 ```javascript
 var number_of_zones = 3;
 ```
+
+Exceptions
+- View exceptions in-line with your USP
+- Add New Exception
+
 
 Features to add
 - ~~Import Zone Names~~
