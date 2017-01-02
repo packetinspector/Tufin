@@ -411,44 +411,46 @@ $(function() {
         exceptions = {};
         $.getJSON( "/securetrack/api/security_policies/exceptions", function(data) {
             // console.log(data);
-            if (! Array.isArray(data.security_policy_exception_list.security_policy_exception)) {
-                e = [].concat(data.security_policy_exception_list.security_policy_exception);
-            } else {
-                e = data.security_policy_exception_list.security_policy_exception;
-            }
-            e.forEach(function(item, index) { 
-                console.log(item);
-                // console.log(item.name);
-                g = {};
-                g.name = item.name
-                g.policy_name = item.exempted_traffic_list.exempted_traffic.security_requirements.zone_to_zone_security_requirement.policy_name;
-                g.comment = item.exempted_traffic_list.exempted_traffic.comment;
-                g.create_date = item.creation_date;
-                g.expire_date = item.expiration_date;
-                g.traffic = item.exempted_traffic_list.exempted_traffic;
-                f = item.exempted_traffic_list.exempted_traffic.security_requirements.zone_to_zone_security_requirement.from_zone;
-                t = item.exempted_traffic_list.exempted_traffic.security_requirements.zone_to_zone_security_requirement.to_zone;
-                //console.log(g);
-                ind = f + t;
-                if (! exceptions[ind]) {
-                    exceptions[ind] = [];
+            if (data.security_policy_exception_list && data.security_policy_exception_list.security_policy_exception) {
+                if (! Array.isArray(data.security_policy_exception_list.security_policy_exception)) {
+                    e = [].concat(data.security_policy_exception_list.security_policy_exception);
+                } else {
+                    e = data.security_policy_exception_list.security_policy_exception;
                 }
-                exceptions[ind].push(g);
-            });
+                e.forEach(function(item, index) { 
+                    console.log(item);
+                    // console.log(item.name);
+                    g = {};
+                    g.name = item.name
+                    g.policy_name = item.exempted_traffic_list.exempted_traffic.security_requirements.zone_to_zone_security_requirement.policy_name;
+                    g.comment = item.exempted_traffic_list.exempted_traffic.comment;
+                    g.create_date = item.creation_date;
+                    g.expire_date = item.expiration_date;
+                    g.traffic = item.exempted_traffic_list.exempted_traffic;
+                    f = item.exempted_traffic_list.exempted_traffic.security_requirements.zone_to_zone_security_requirement.from_zone;
+                    t = item.exempted_traffic_list.exempted_traffic.security_requirements.zone_to_zone_security_requirement.to_zone;
+                    //console.log(g);
+                    ind = f + t;
+                    if (! exceptions[ind]) {
+                        exceptions[ind] = [];
+                    }
+                    exceptions[ind].push(g);
+                });
 
-             //Refind exceptions
-            $('#uspgrid tr td:not(:first-child)').each(function() {
-                //console.log(this);
-                current_cell = usp_table.cell(this);
-                $(current_cell.node()).removeClass("exceptions");
-                //Grab the zones based on cell
-                to = $(usp_table.column(this).header()).text();
-                from = $(usp_table.row(this).node()).find('td:eq(0)').text();
-                ind = from + to;
-                if (exceptions[ind]) {
-                    $(current_cell.node()).addClass('exceptions');
-                }
-            });
+                 //Refind exceptions
+                $('#uspgrid tr td:not(:first-child)').each(function() {
+                    //console.log(this);
+                    current_cell = usp_table.cell(this);
+                    $(current_cell.node()).removeClass("exceptions");
+                    //Grab the zones based on cell
+                    to = $(usp_table.column(this).header()).text();
+                    from = $(usp_table.row(this).node()).find('td:eq(0)').text();
+                    ind = from + to;
+                    if (exceptions[ind]) {
+                        $(current_cell.node()).addClass('exceptions');
+                    }
+                });
+            }
         });
         // console.log("Found: ")
         // console.log(exceptions);
