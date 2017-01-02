@@ -49,7 +49,7 @@ $(function() {
 
     var exc_skel = {
       "security_policy_exception": {
-          "name": "My Cool Exception TEST",
+          "name": "Name of Exception",
           "domain": {
             "name": "Default"
           },
@@ -705,14 +705,14 @@ $(function() {
     function traverse(jsonObj) {
         if( typeof jsonObj == "object" ) {
             $.each(jsonObj, function(k,v) {
-                // k is either an array index or object key
+                // index. make it a header
                 r = r + '<tr><td>' + k + '</td>';
                 traverse(v);
                 r= r + '</tr>';
             });
         }
             else {
-                // jsonOb is a number or string
+                // output
                 r = r + '<td>' + jsonObj + '</td>';
             }
     }
@@ -736,6 +736,7 @@ $(function() {
                     }
                 });
                 if (found) {
+                    // Find a better way to parse/display the return, this will work for now
                     r = '';
                     traverse(found);
                     out = '<table>' + r + '</table>';
@@ -747,16 +748,18 @@ $(function() {
     });
 
     //Display version
-
     $('#version_text').text(usp_editor_version);
+    //Hide things
     $('#about').hide();
     $('#instructions').hide();
 
     if (document.location.href.includes('file://') || document.location.href.includes('codepen')){
+        // We are offline. hide the things
         $("#online_menu_bar").hide();
         $("#online_selections").hide();
         $('#online').hide();
     } else {
+        // online, load the things
         on_server = true;
         $("#get_usps").click();
         $('#offline').hide();
