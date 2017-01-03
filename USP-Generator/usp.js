@@ -1,5 +1,5 @@
 $(function() {
-    var usp_editor_version = 'Version 2.0B';
+    var usp_editor_version = 'Version 2.0.2B';
 
 
     var number_of_zones = 3;
@@ -447,7 +447,7 @@ $(function() {
 
     $("#get_usps").on("click", function () {
         $.getJSON( "/securetrack/api/security_policies/", function(data) {
-              console.log( "success" );
+              console.log( "USP Fetch success" );
               console.log(data);
               console.log(data.SecurityPolicyList.securityPolicies.securityPolicy);
               //Clear select
