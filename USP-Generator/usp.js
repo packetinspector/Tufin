@@ -370,6 +370,16 @@ $(function() {
         
     });
 
+    $("#download_button").on("click", function() {
+        make_csv();
+        link = document.createElement('a');
+        link.download = 'USP-Gen.csv';
+        link.href = 'data:text/csv;base64,' + btoa($("#output").val());
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    });
+
     $("#df_button").on("click", function() {
         $("#devices_list").empty();
         $.getJSON( "/securetrack/api/devices/", function(data) {
