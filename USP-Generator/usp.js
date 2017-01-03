@@ -477,18 +477,31 @@ $(function() {
 
     $("#get_zones").on("click",function fetch_zones() {
         $.getJSON("/securetrack/api/zones/", function(data) {
-            console.log("success");
-            console.log("Found " + data.zones.count + " Zones");
+            // console.log("success");
+            console.log("Zone Fetch Success. Found " + data.zones.count + " Zones");
             console.log(data.zones);
             //Empty the zones to avoid dupes
             $('#server_zones').empty()
+            //Add zones from api
+            if (data.zones.count > 1) {
+                // It's an array
+                e = data.zones.zone;
+            } else {
+                //It's zero or one, so make it an array
+                e = [].concat(data.zones.zone)
+            }
+            api_zones = [];
+            e.forEach(function(item, index) {   
+                $('#server_zones').append($("<option></option>").attr("value",item.name).text(item.name));
+                api_zones.push(item.name); 
+            });
+            //console.log(api_zones);
             //Add zones the user is currently working with
             $('#uspgrid tr td:first-child').each(function() {
-                $('#server_zones').append($("<option></option>").attr("value",$(this).text()).text($(this).text()));
-            });
-            //Add zones from api
-            data.zones.zone.forEach(function(item, index) {   
-                $('#server_zones').append($("<option></option>").attr("value",item.name).text(item.name)); 
+                z = $(this).text();
+                if (api_zones.indexOf(z) === -1) {
+                    $('#server_zones').append($("<option></option>").attr("value",z).text(z));
+                }
             });
         }).fail(function() {
             alert("Failed to fetch Zones");
