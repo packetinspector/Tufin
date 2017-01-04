@@ -823,7 +823,7 @@ $(function() {
             }
     }
 
-    $( document ).tooltip({
+    $( 'body' ).tooltip({
         items: "li.ex",
         track: true,
         classes: { "ui-tooltip" : "ruleprops"},
