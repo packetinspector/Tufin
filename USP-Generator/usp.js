@@ -1,5 +1,5 @@
 $(function() {
-    var usp_editor_version = 'Version 2.0.2B';
+    var usp_editor_version = 'Version 2.0.3B';
 
 
     var number_of_zones = 3;
@@ -131,6 +131,21 @@ $(function() {
     // $( "#severity" ).selectmenu();
     // $( "#flow_types" ).selectmenu();
     
+    function uniformity(unknown) {
+        //API returns different types. This outputs an array, always
+        if (Array.isArray(unknown)) {
+            //It's an array! Just return it
+            return unknown
+        } else if (unknown === '') {
+            //Empty string
+            return []
+        } else {
+            //Single.  Add it to an array
+            return [].concat(unknown)
+        }
+    }
+
+
     //Save all the form data into JSON into the cell
     function updateCell() {
         //Start the object
@@ -447,15 +462,20 @@ $(function() {
 
     $("#get_usps").on("click", function () {
         $.getJSON( "/securetrack/api/security_policies/", function(data) {
-              console.log( "USP Fetch success" );
-              console.log(data);
-              console.log(data.SecurityPolicyList.securityPolicies.securityPolicy);
+              console.log( "USP Fetch success", data );
+              // console.log(data.SecurityPolicyList.securityPolicies.securityPolicy);
               //Clear select
               $('#usp_list').empty();
               $('#usp_list').append($("<option></option>").attr("value",0).text("Choose USP"));
-              data.SecurityPolicyList.securityPolicies.securityPolicy.forEach(function(item, index) {   
+              if (typeof(data.SecurityPolicyList.securityPolicies) !== 'undefined') {
+                //USPs exists
+                e = uniformity(data.SecurityPolicyList.securityPolicies.securityPolicy);
+                e.forEach(function(item, index) {   
                     $('#usp_list').append($("<option></option>").attr("value",item.id).text(item.name)); 
                 });
+              } else {
+                console.log("No USPs on Server");
+              }
             })
           .fail(function() {
             alert( "Failed to fetch USPs" );
@@ -483,13 +503,7 @@ $(function() {
             //Empty the zones to avoid dupes
             $('#server_zones').empty()
             //Add zones from api
-            if (data.zones.count > 1) {
-                // It's an array
-                e = data.zones.zone;
-            } else {
-                //It's zero or one, so make it an array
-                e = [].concat(data.zones.zone)
-            }
+            e = uniformity(data.zones.zone);
             api_zones = [];
             e.forEach(function(item, index) {   
                 $('#server_zones').append($("<option></option>").attr("value",item.name).text(item.name));
@@ -517,30 +531,30 @@ $(function() {
         exceptions = {};
         $.getJSON( "/securetrack/api/security_policies/exceptions", function(data) {
             // console.log(data);
-            if (! Array.isArray(data.security_policy_exception_list.security_policy_exception)) {
-                e = [].concat(data.security_policy_exception_list.security_policy_exception);
+            if (data.security_policy_exception_list.security_policy_exception) {
+                e = uniformity(data.security_policy_exception_list.security_policy_exception);
+                e.forEach(function(item, index) { 
+                    console.log(item);
+                    // console.log(item.name);
+                    g = {};
+                    g.name = item.name
+                    g.policy_name = item.exempted_traffic_list.exempted_traffic.security_requirements.zone_to_zone_security_requirement.policy_name;
+                    g.comment = item.exempted_traffic_list.exempted_traffic.comment;
+                    g.create_date = item.creation_date;
+                    g.expire_date = item.expiration_date;
+                    g.traffic = item.exempted_traffic_list.exempted_traffic;
+                    f = item.exempted_traffic_list.exempted_traffic.security_requirements.zone_to_zone_security_requirement.from_zone;
+                    t = item.exempted_traffic_list.exempted_traffic.security_requirements.zone_to_zone_security_requirement.to_zone;
+                    //console.log(g);
+                    ind = f + t;
+                    if (! exceptions[ind]) {
+                        exceptions[ind] = [];
+                    }
+                    exceptions[ind].push(g);
+                });
             } else {
-                e = data.security_policy_exception_list.security_policy_exception;
+                console.log('No exceptions on server');
             }
-            e.forEach(function(item, index) { 
-                console.log(item);
-                // console.log(item.name);
-                g = {};
-                g.name = item.name
-                g.policy_name = item.exempted_traffic_list.exempted_traffic.security_requirements.zone_to_zone_security_requirement.policy_name;
-                g.comment = item.exempted_traffic_list.exempted_traffic.comment;
-                g.create_date = item.creation_date;
-                g.expire_date = item.expiration_date;
-                g.traffic = item.exempted_traffic_list.exempted_traffic;
-                f = item.exempted_traffic_list.exempted_traffic.security_requirements.zone_to_zone_security_requirement.from_zone;
-                t = item.exempted_traffic_list.exempted_traffic.security_requirements.zone_to_zone_security_requirement.to_zone;
-                //console.log(g);
-                ind = f + t;
-                if (! exceptions[ind]) {
-                    exceptions[ind] = [];
-                }
-                exceptions[ind].push(g);
-            });
 
              //Refind exceptions
             $('#uspgrid tr td:not(:first-child)').each(function() {
@@ -603,7 +617,7 @@ $(function() {
             temp_skel.severity = severity.indexOf(item[4]) || 0;
             temp_skel.services = item[6];
             temp_skel.flow_types = flow_types.indexOf(item[8]);
-            //No support for number fields, normallize with regex first
+            //No support for number fields, normalize with regex first
             nr = item[7].replace(/\:\d+\}/g, ":X}");
             temp_skel.rule_props = nr.split(";").map(function(value, index) { return rule_props.indexOf(value);});
             dt_rows[row][col] = JSON.stringify(temp_skel);
