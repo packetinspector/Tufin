@@ -2,6 +2,10 @@
 
 ##### Convert Tufin Network Objects to Palo Groups
 Script will convert network objects and groups from ST into Palo objects. CKP, ASA, Stonesoft, Openstack, NSX, AWS are examples...
+Makes use of pandevice
+```
+$ pip install pandevice
+```
 
 ```bash
 $ ./Tufin-Objects2Palo.py -d 8
