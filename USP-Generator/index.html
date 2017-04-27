@@ -28,9 +28,9 @@
         .ruleprops { font-family: "Segoe UI", Tahoma, sans-serif; font-size: 14px; }
         td.exceptions {  background-position: bottom left; background-repeat: no-repeat; background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABP0lEQVR4nKWTvW7CMBRGj4NrVGXqRCcqsaGwoEg8CY/Jk7AwRSxd2qlbJivEvx2SEifpgFpPvvnuPffLtS0AqqKI/GEVVSVkVRTxZb/n9XAAYx6rVIqv85kKogRYlSWhqsC5Ick5YtsCIJZLkHLQpGRVltSXCxIgaE1smlGTqDXqdALAHI+IPB9EaxFadyyAYC3B2hEgNA3qx0zTkCk10rM+vwMYg5/8v0+AzloW0/n0sQSI1hImCWkcjEFM9LmDfmD3rkmBMwYmepY68MaMCgB8COP91EEKCG07c+Cd42O7BeApz2cOQh8PgEkHd7vxdr0C8LnbMV0jQGzb2RDTU/DWkmXZSI8pwP/igBh532wAWEg5P+YUABBiJKZXGciE6Fje472/fxfJtZYAuq55Xq+JDz4moRS6rrs9/O85fwOY+st4zY2qywAAAABJRU5ErkJggg==);}
         button.menu_buttons {
-            font-family: 'Segoe UI', Tahoma, sans-serif; font-size: small; display: block; float: left;
+            font-family: 'Segoe UI', Tahoma, sans-serif; font-size: small; display: block; float: left; text-align: center; line-height: 12px;
         }
-        p.menu_style { font-family: 'Segoe UI'; font-size: 16px; font-weight: bold; margin-top: 5px; }
+        p.menu_style { font-family: 'Segoe UI', Tahoma, sans-serif; font-size: 14px; font-weight: bold; margin-top: 5px; }
         p.server_functions {border-style: inset; border-color: orange; width: 400px; padding: 10px;}
         /*table.dataTable thead th, table.dataTable thead td {padding: 5px 2px; font-family: "Segoe UI", Tahoma, sans-serif; font-size:12px;}*/
         ul.tagit {
@@ -109,6 +109,40 @@
 
 <body>
 <div id="header" style="float: left; width: 100%;">
+    <table align=left height=0 border=0 cellpadding=0 cellspacing=0><tr><td style="min-height:40px;line-height:12px;">
+    <p class="menu_style" style="float: left;">CSV&nbsp;</p>
+    <button id="import_button" class="menu_buttons">Import</button>
+    <button id="export" class="menu_buttons">Export</button>
+    <button id="download_button" class="menu_buttons">Download</button>
+
+    <p class="menu_style" style="float: left;">&nbsp;|&nbsp;</p>
+
+    <p class="menu_style" style="float: left;">&nbsp;&nbsp;Zones&nbsp;</p>
+    <button id="add_zone" class="menu_buttons">Add</button>
+
+    <p class="menu_style" style="float: left;">&nbsp;|&nbsp;</p>
+
+<div id="offline_menu_bar" style="float:left">
+    <p class="menu_style" style="float: left; margin-top: 4px;">&nbsp;&nbsp;USPs&nbsp;</p>
+    <button id="new_usp" class="menu_buttons">Create</button>
+</div>
+<div id="online_menu_bar" style="float:left">
+    <p class="menu_style" style="float: left;">&nbsp;&nbsp;Load&nbsp;</p>
+    <button id="get_zones" class="menu_buttons">Zones</button>
+    <button id="get_usps" class="menu_buttons">USPs</button>
+    <button id="get_exceptions" class="menu_buttons">Exceptions</button>
+    <p class="menu_style" style="float: left;">&nbsp;|&nbsp;</p>
+    <button id="wizard_button" class="menu_buttons">Wizard</button>
+</div>
+</td></tr><tr><td align=left style="min-height:40px;line-height:12px;">
+    <p class="menu_style" style="float: left; margin-top: 4px;">Default domain&nbsp;</p>
+    <input type="text" id="default_domain" name="default_domain" value="Default" style="float: left; margin-top: 0px; margin: 0px;">
+<div id="online_selections" style="float:left">
+    <p class="menu_style" style="float: left;">&nbsp;|&nbsp;</p>
+    <p class="menu_style" style="float: left; margin-top: 0px;">&nbsp;&nbsp;USPs&nbsp;
+    <select name="usp_list" id="usp_list"><option>Fetch USPs First</option></select></p>
+</div>
+    </td></tr></table>
 <div id="top_level" style="float: right;">
     <p class="menu_style" style="float: left;">USP Editor |&nbsp;</p>
     <div id="status" style="float: left;">
@@ -116,41 +150,18 @@
     <p id="offline" class="menu_style" style="background: red; color: white; float: left;">Offline</p>
     </div>
     <p class="menu_style" style="float: left;">&nbsp;|&nbsp;</p>
-    <div id="version" style="float: left;"><p id="version_text" class="menu_style">Version 2.0</p>
+    <div id="version" style="float: left;"><p id="version_text" class="menu_style">Version 2.0.3C</p>
     </div>
     <p class="menu_style" style="float: left;">&nbsp;|&nbsp;</p>
     <button id="button_inst" class="menu_buttons">Instructions</button>
     <p class="menu_style" style="float: left;">&nbsp;|&nbsp;</p>
     <button id="button_about" class="menu_buttons">About</button>
 </div>
-<div id="offline_menu_bar" style="float:left">
-    <p class="menu_style" style="float: left;">CSV&nbsp;&nbsp;</p>
-    <button id="import_button" class="menu_buttons">Import</button>
-    <p class="menu_style" style="float: left;">&nbsp;|&nbsp;</p>
-    <button id="export" class="menu_buttons">Export</button>
-    <p class="menu_style" style="float: left;">&nbsp;|&nbsp;</p>
-    <button id="download_button" class="menu_buttons">Download</button>
-    <p class="menu_style" style="float: left;">&nbsp;Zones&nbsp;&nbsp;</p>
-    <button id="add_zone" class="menu_buttons">Add</button>
 </div>
-<div id="online_menu_bar" style="float:left">
-    <p class="menu_style" style="float: left;">&nbsp;Reload&nbsp;&nbsp;</p>
-    <button id="get_zones" class="menu_buttons">Zones</button>
-    <p class="menu_style" style="float: left;">&nbsp;|&nbsp;</p>
-    <button id="get_usps" class="menu_buttons">USPs</button>
-    <p class="menu_style" style="float: left;">&nbsp;|&nbsp;</p>
-    <button id="get_exceptions" class="menu_buttons">Exceptions</button>
-    <p class="menu_style" style="float: left;">&nbsp;--&nbsp;</p>
-    <button id="wizard_button" class="menu_buttons">Wizard</button>
+<div id="top_usp_name" style="float:left;margin-top: 0px;margin: 0px;margin: 0px; ">
+    <input size=400 type=text name="newuspname" id="newuspname" value="USP-Gen" style="font-family: 'Segoe UI', Tahoma, sans-serif; font-weight: bold; font-size: 16px; border:none; outline: none;  border-color: inherit; -webkit-box-shadow: none; box-shadow: none;">
 </div>
-<div id="online_selections" style="float: left;">
-    <p class="menu_style" style="float: left; margin-top: 0px;">&nbsp;Domain&nbsp;&nbsp;</p>
-    <input type="text" id="default_domain" name="default_domain" value="Default" style="float: left; margin: 0px;">
-    <p class="menu_style" style="float: left; margin-top: 0px;">&nbsp;Select USP Template&nbsp;&nbsp;</p>
-    <select name="usp_list" id="usp_list"><option>Fetch USPs First</option></select>
-</div>
-</div>
-<table id="uspgrid" class="cell-border"></table>
+<table id="uspgrid" class="cell-border" style="font-family: 'Segoe UI', Tahoma, sans-serif; font-size: small;"></table>
 <div id="detailsDialog">
     <div id="tabs">
         <ul>
@@ -173,6 +184,7 @@
                 <label for="services_tags">Services (Autocomplete or type in)</label>
                 <input name="tags" id="services_tags" value="">
             </fieldset>
+                <button id="close_update_zone">Close</button>
                 <button id="update_zone">Update Zone</button>
             </form>
         </div>
@@ -197,6 +209,7 @@
             <input type="number" name="port" value="" min="1" max="65536" style="display:inline" required>
             <select name="proto"><option value="tcp">tcp</option><option value="udp">udp</option><option value="icmp">icmp</option></select> 
             </fieldset>
+            <button id="close_ex">Close</button>
             <button id="add_ex">Add Exception</button>
             <button id="reset_ex">Reset Form</button>
             </form>
@@ -204,16 +217,28 @@
         </div>
     </div>
 </div>
+<div id="newuspDialog">
+<form id="newuspForm">
+<fieldset class="noborder">
+    <label for="usp_name">USP Name</label>
+    <input type="text" size="40" id="usp_name" name="usp_name">
+    <br><br>
+    Note that you will need to create an empty USP at <b>SecureTrack->Audit->Compliance</b> to import this file.
+</fieldset>
+</form>
+</div>
 <div id="nameDialog">
 <form id="nameForm">
 <fieldset class="noborder">
     <label for="zone_name">Zone Name</label>
     <input type="text" size="20" id="zone_name" name="zone_name">
-    <select id="server_zones" name="server_zones"></select>
+    <select id="zone_list" name="zone_list"></select>
+    <br><br>
+    Note that new zones must exists at <b>SecureTrack</a> before loading this USP.
+    Follow the further instructions to load the file generated by this tool.
 </fieldset>
 </form>
 </div>
-
 <div id="wizard_dialog">
 <div id="device_fetch"><div id="devices_list">Click the button to continue</div><button id="df_button">Load Devices</button><button id="interfaces_button">Load Interfaces</button>
 </div>
@@ -225,23 +250,25 @@
 <span style="font-family: 'Segoe UI', Tahoma, sans-serif; font-size: small; margin-bottom: 15px;">
 <h4>Instructions</h4>
 <ul>
- <li>Domains, Zones, USPs and Exceptions are loaded on startup if online. Click the reload button if you want to refresh.
- <li>Enter Domain where you want to create USPs.
- <li>You can start from the suggested clean USP with 3 zones, select an existing Zone from Tufin to edit or import a local USP.
- <li>To import a local USP, just paste it's contents in the textarea below and click on <b>Import CSV</b>.
- <li>Click on the Zone names on the left to rename.
- <li>Click on cells to modify policy. 
- <li>After finising your edits, click on <b>Export CSV</b> to generate the USP contents in the textbox.
+ <li><b>Zones</b>, <b>USPs</b> and <b>Exceptions</b> are loaded on startup if online. Click the desired <b>Load</b> button to refresh each online data;
+ <li>Enter <b>Default Domain</b> where you want to create USPs;
+ <li>You can select an existing USP or create a new one at <b>USPs New/Create</b>;
+ <li>To import a local USP, just paste it's contents into the respective textarea below and click on <b>CSV Import</b>.
+ <li>Click on the Zone names on the left to select an existing Zone if online or rename it;
+ <li>Click on cells to modify policy;
+ <li>When your work is done, click on <b>CSV Export</b> to generate the USP contents in the textbox and review it.
+ <li>To load the results into Tufin, click on <b>CSV Download</b> and you will get two files:
  <ul>
-  <li>To load the results into Tufin you need to copy and paste all generated contents into a .CSV text file and import into a new or existing USP on <b><nobr>SecureTrack->Audit->Compliance</nobr></b>.
+   <li> <b>USP-Gen-Zones.csv</b> - The list of Zones not already online to me imported at <b><nobr>SecureTrack->Network->Zones->Import CSV</nobr></b>
+   <li> <b>USP-Gen.csv</b> - The USP content to be imported at <b><nobr>SecureTrack->Audit->Compliance</nobr></b> info a new or existing USP
+   Be sure to import the Zone file BEFORE importing the USP.
  </ul>
- <li>To import a local USP, just paste it's contents on below textarea and then click on <b>Import CSV</b> button.
 </ul>
 Online functions require server installation because of <a href="https://en.wikipedia.org/wiki/Same-origin_policy">Same-Origin</a>
 <h4>Exceptions</h4>
 <ul>
 <li>Cells will be marked if an exception exists.</li>
-<li>Click on a cell to view or to add a new exception</li>
+<li>Click on an cell to view or to add a new exception</li>
 <li>Exceptions are added directly to the server via API</li>
 </ul>
 </span>
@@ -266,5 +293,9 @@ Get the files, the script and more information at <a href="https://github.com/pa
 </span>
 </div>
 
-<br><h4>CSV Input / Output</h4><textarea id="output" name="output" style="width: 100%;height: 600px;overflow-y: scroll;"></textarea>
+<span style="font-family: 'Segoe UI', Tahoma, sans-serif; font-size: 14px;">
+<br><b>USP CSV Input/Output</b><textarea id="output" name="output" style="width: 100%;height: 300px;overflow-y: scroll;font-family: 'Segoe UI', Tahoma, sans-serif; font-size: 10px;"></textarea>
+<br>
+<br><b>Zones CSV Output</b><textarea id="output2" name="output2" style="width: 100%;height: 300px;overflow-y: scroll;font-family: 'Segoe UI', Tahoma, sans-serif; font-size: 10px;"></textarea>
+</span>
 </html>

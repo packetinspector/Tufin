@@ -1,12 +1,13 @@
 $(function() {
-    var usp_editor_version = 'Version 2.0.3B';
-
-
+    var usp_editor_version = 'Version 2.0.3C';
     var number_of_zones = 3;
+    var server_zones = new Array();
+    var local_zones = new Array();
 
 //Global Var
     var current_cell;
     var exceptions = {};
+
 //Structure for zone props
     var zone_types = [
     'allow all',
@@ -225,6 +226,7 @@ $(function() {
             // buttons: {"Update": updateCell},
             position: { my: "center", at: "center top", of: window }
     });
+
     $("#wizard_dialog").dialog({
         autoOpen: false,
         width: 800,
@@ -236,6 +238,25 @@ $(function() {
         // buttons: {"Update": updateCell},
         position: { my: "center", at: "center top", of: window }
     });
+
+    //New USP form
+    $("#newuspDialog").dialog({
+            autoOpen: false,
+            width: 500,
+            close: function() {
+                form[0].reset();
+                $("#detailsForm").find(".error").removeClass("error");
+            },
+            buttons: {
+              "Ok": function() {
+                 $("#newuspname").val($("#usp_name").val().replace(/.*(\/|\\)/, '').replace(/[^a-zA-Z0-9\-]/gi, '_'));
+                 $('#top_usp_name').show();
+                 reset_usp();
+                 $("#newuspDialog").dialog('close');
+              }
+           }
+    });
+
     //Name form
     $("#nameDialog").dialog({
             autoOpen: false,
@@ -244,24 +265,36 @@ $(function() {
                 form[0].reset();
                 $("#detailsForm").find(".error").removeClass("error");
             },
-            buttons: {"Rename": function() {
+            buttons: {
+              "Close": function() {
+                form[0].reset();
+                $("#detailsForm").find(".error").removeClass("error");
+                $("#nameDialog").dialog('close');
+              },
+              "Rename": function() {
                 //Get name from form
-                nn = $("#zone_name").val();
-                if ($('th').map(function () { return $(this).text(); }).get().indexOf(nn) > 0) {
+                z = $("#zone_name").val();
+                if ($('th').map(function () { return $(this).text(); }).get().indexOf(z) > 0) {
                     //Name in Use
-                    alert('Name in use. Try again.');
+                    alert('Name in use. Try again or close to abort.');
                     $("#zone_name").addClass("error");
                 } else {
                     //Update Cell
-                    current_cell.data(nn);
+                    current_cell.data(z);
                     //Find corresponding column and update
                     idx = current_cell.index();
                     idx = idx.row + 1;
-                    $(usp_table.column(idx).header()).text(nn);
-                    make_csv();
+                    $(usp_table.column(idx).header()).text(z);
                     $( this ).dialog( "close" );
+                    if (local_zones.indexOf(z) === -1 && server_zones.indexOf(z) === -1) {
+                      console.log("Adding "+z+" from Zone Rename dialog to local_list");
+                      local_zones.push(z);
+                      $('#zone_list').append($("<option></option>").attr("value",z).text(z));
+                    }
+                    make_csv();
                 }
-            }}
+              }
+           }
     });
 
 
@@ -326,11 +359,18 @@ $(function() {
         }
     };
 
+    //Show form for new usp name 
+    function shownewuspDialog() {
+        $('#top_usp_name').hide();
+        $("#newuspDialog").dialog("option", "title", "Choose a name for the new USP").dialog("open");
+    }
+
     //Show form for zone name edit
     function showRenameDialog(e) {
         current_cell = usp_table.cell(e);
         $("#nameDialog").dialog("option", "title", "Rename Zone").dialog("open");
         $("#zone_name").val(current_cell.data());
+        $('#zone_list option:contains(' + 'Select another zone' + ')').prop({selected: true});
         //console.log(usp_table.columns)
     }
 
@@ -341,14 +381,24 @@ $(function() {
 
     //Now working
     $("#add_zone").on("click", function() {
-        //console.log("adding zone");
-        make_csv();
         import_csv($("#output").val(), true);
     }).show();
 
     //Give the button a purpose
     $("#export").on("click", function() {
         make_csv();
+    });
+
+    $("#new_usp").on("click", function() {
+        shownewuspDialog();
+    });
+
+    $("#close_update_zone").on("click", function() {
+        $("#detailsDialog").dialog( "close" );
+    });
+
+    $("#close_ex").on("click", function() {
+        $("#detailsDialog").dialog( "close" );
     });
 
     $("#update_zone").on("click", function() {
@@ -370,10 +420,12 @@ $(function() {
     });
 
     $("#button_inst").on("click", function() {
+        $("#about").hide();
         $("#instructions").toggle();
     });
 
     $("#button_about").on("click", function() {
+        $("#instructions").hide();
         $("#about").toggle();
     });
 
@@ -385,14 +437,28 @@ $(function() {
         
     });
 
+
     $("#download_button").on("click", function() {
         make_csv();
-        link = document.createElement('a');
-        link.download = 'USP-Gen.csv';
-        link.href = 'data:text/csv;base64,' + btoa($("#output").val());
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+        linkusp = document.createElement('a');
+        linkzones = document.createElement('a');
+        if ($("#newuspname").val()) {
+           linkusp.download = $("#newuspname").val()+'.csv';
+           linkzones.download = $("#newuspname").val()+'-Zones.csv';
+           console.log('Downloading USP as '+linkusp.download+' and Zones as '+linkzones.download);
+        }else{
+           linkusp.download = 'USP-Gen.csv';
+           linkzones.download = 'Zone-Gen.csv';
+        }
+        linkusp.href = 'data:text/csv;base64,' + btoa($("#output").val());
+        linkzones.href = 'data:text/csv;base64,' + btoa($("#output2").val());
+        document.body.appendChild(linkusp);
+        document.body.appendChild(linkzones);
+        linkusp.click();
+        linkzones.click();
+        alert("Two files were downloaded: \n\t"+linkusp.download+" and\n\t"+linkzones.download+"\n\nPlease import the Zone file before importing the USP CSV."); 
+        document.body.removeChild(linkusp);
+        document.body.removeChild(linkzones);
     });
 
     $("#df_button").on("click", function() {
@@ -466,16 +532,19 @@ $(function() {
               // console.log(data.SecurityPolicyList.securityPolicies.securityPolicy);
               //Clear select
               $('#usp_list').empty();
-              $('#usp_list').append($("<option></option>").attr("value",0).text("Choose USP"));
               if (typeof(data.SecurityPolicyList.securityPolicies) !== 'undefined') {
                 //USPs exists
+                $('#usp_list').append($("<option></option>").attr("value",0).text("Choose USP"));
                 e = uniformity(data.SecurityPolicyList.securityPolicies.securityPolicy);
                 e.forEach(function(item, index) {   
                     $('#usp_list').append($("<option></option>").attr("value",item.id).text(item.name)); 
                 });
               } else {
+                $('#usp_list').append($("<option></option>").attr("value",0).text("There's no USP on server"));
                 console.log("No USPs on Server");
               }
+              $('#usp_list').append($("<option></option>").attr("value",0).text("---------------------------"));
+              $('#usp_list').append($("<option></option>").attr("value",-1).text("Create a clean USP"));
             })
           .fail(function() {
             alert( "Failed to fetch USPs" );
@@ -486,44 +555,90 @@ $(function() {
         //console.log(this);
         //console.log($(this).find('option:selected').attr("value"));
         usp_id = $(this).find('option:selected').attr("value");
-        $.get('/securetrack/api/security_policies/' + usp_id + '/export', function(data) {
+        if (usp_id >0){
+         $.get('/securetrack/api/security_policies/' + usp_id + '/export', function(data) {
             //console.log(data);
             $("#output").val(data);
             import_csv($("#output").val());
-        }).fail(function() {
+         }).fail(function() {
             alert("Failed to Fetch USP");
-        });
+         });
+        }else{
+         if (usp_id==-1) {
+            shownewuspDialog();
+         }
+        }
+
     });
 
     $("#get_zones").on("click",function fetch_zones() {
+        console.log('Running get_zones...');
         $.getJSON("/securetrack/api/zones/", function(data) {
             // console.log("success");
             console.log("Zone Fetch Success. Found " + data.zones.count + " Zones");
             console.log(data.zones);
-            //Empty the zones to avoid dupes
-            $('#server_zones').empty()
+            //Empty the zones from GUI and online arrays to avoid dupes
+            console.log('Clearing GUI and online lists...');
+            $('#zone_list').empty();
+            server_zones=[];
             //Add zones from api
             e = uniformity(data.zones.zone);
-            api_zones = [];
+            $('#zone_list').append($("<option></option>").attr("value","").text("Select another zone"));
+            $('#zone_list').append($("<option></option>").attr("value","").text("---------------------------"));
             e.forEach(function(item, index) {   
-                $('#server_zones').append($("<option></option>").attr("value",item.name).text(item.name));
-                api_zones.push(item.name); 
+                $('#zone_list').append($("<option></option>").attr("value",item.name).text(item.name));
+                server_zones.push(item.name);
             });
-            //console.log(api_zones);
+            console.log("server_zones="+server_zones);
             //Add zones the user is currently working with
-            $('#uspgrid tr td:first-child').each(function() {
-                z = $(this).text();
-                if (api_zones.indexOf(z) === -1) {
-                    $('#server_zones').append($("<option></option>").attr("value",z).text(z));
+            local_zones.forEach(function(item, index) {
+                if (server_zones.indexOf(z) === -1) {
+                   console.log('Adding '+item+' from local to zone_list');
+                   $('#zone_list').append($("<option></option>").attr("value",item).text(item));
                 }
             });
+            $('#uspgrid tr td:first-child').each(function() {
+                z = $(this).text();
+                if (local_zones.indexOf(z) === -1) {
+                    console.log('['+local_zones.indexOf(z)+'] Adding '+ z +' from grid to local zone');
+                    local_zones.push(z);
+                    if (server_zones.indexOf(z) === -1) {
+                      console.log('Adding '+ z +' from grid to zone_list');
+                      $('#zone_list').append($("<option></option>").attr("value",z).text(z));
+                    }
+                }
+            });
+            console.log("local_zones="+local_zones);
+	    console.log('server_zones='+server_zones.length);
+            console.log('local_zones='+local_zones.length);
         }).fail(function() {
             alert("Failed to fetch Zones");
         });
     });
 
+    function get_local_zones() {
+            console.log('Running get_local_zones...');
+            //Empty the zones to avoid dupes
+            $('#zone_list').empty();
+            $('#zone_list').append($("<option></option>").attr("value","").text("Select another zone"));
+            $('#zone_list').append($("<option></option>").attr("value","").text("---------------------------"));
+            //Add zones the user is currently working with
+            $('#uspgrid tr td:first-child').each(function() {
+                z = $(this).text();
+                if (local_zones.indexOf(z) === -1) {
+                    console.log('Adding '+ z +' from grid to local and zone_list');
+                    local_zones.push(z);
+                    $('#zone_list').append($("<option></option>").attr("value",z).text(z));
+                }
+            });
+    }
+
     $("#import_button").on("click", function() {
+      if (!$("#output").val()) {
+        alert('No USP to be imported. Try again.');
+      } else {
         import_csv($("#output").val());
+      }
     });
 
     function import_exceptions() {
@@ -538,17 +653,26 @@ $(function() {
                     // console.log(item.name);
                     g = {};
                     g.name = item.name
-                    g.policy_name = item.exempted_traffic_list.exempted_traffic.security_requirements.zone_to_zone_security_requirement.policy_name;
+                    // fix exception on load when there’s exceptions without existing USP reference
+                    if (typeof(item.exempted_traffic_list.exempted_traffic.security_requirements.zone_to_zone_security_requirement) !== 'undefined') {
+                     g.policy_name = item.exempted_traffic_list.exempted_traffic.security_requirements.zone_to_zone_security_requirement.policy_name;
+                    }
                     g.comment = item.exempted_traffic_list.exempted_traffic.comment;
                     g.create_date = item.creation_date;
                     g.expire_date = item.expiration_date;
                     g.traffic = item.exempted_traffic_list.exempted_traffic;
-                    f = item.exempted_traffic_list.exempted_traffic.security_requirements.zone_to_zone_security_requirement.from_zone;
-                    t = item.exempted_traffic_list.exempted_traffic.security_requirements.zone_to_zone_security_requirement.to_zone;
+                    // fix exception on load when there’s exceptions without existing USP reference
+                    if (typeof(item.exempted_traffic_list.exempted_traffic.security_requirements.zone_to_zone_security_requirement) !== 'undefined') {
+                     f = item.exempted_traffic_list.exempted_traffic.security_requirements.zone_to_zone_security_requirement.from_zone;
+                     t = item.exempted_traffic_list.exempted_traffic.security_requirements.zone_to_zone_security_requirement.to_zone;
+                    } else {
+                     f = '';
+                     t = '';
+                    }
                     //console.log(g);
                     ind = f + t;
                     if (! exceptions[ind]) {
-                        exceptions[ind] = [];
+                       exceptions[ind] = [];
                     }
                     exceptions[ind].push(g);
                 });
@@ -577,9 +701,17 @@ $(function() {
     function import_csv (uspstuff, add_new=false) {
         //Now we parse the text
         lines = uspstuff.trim().split("\n");
+
+        //Learn USP format from header 
+        header_row=lines[0].replace(/\"/g,"").split(',');
+        console.log('header row='+header_row);
+        console.log('header row length='+header_row.length);
+
         //We don't need the row header
         lines.splice(0,1);
         //Number of zones
+        console.log('lines='+lines);
+
         nz = Math.sqrt(lines.length);
         if (!Number.isInteger(nz)) {
             alert('Error in CSV');
@@ -587,55 +719,118 @@ $(function() {
         two_d = lines.map(function(line) {
             return line.replace(/\"/g,"").split(",");
         })
+        console.log('two_d='+two_d);
+
         //I'd like to trust the CSV is in order but...
-        from_cols = two_d.map(function(value,index) { return value[1]; });
-        to_cols = two_d.map(function(value,index) { return value[3]; });
+        if (header_row.length==9){
+
+         //get 1st from_domain and update top bar default domain
+         //must update logic when USP between different domains is supported
+         $("#default_domain").val(two_d[0][0]);
+         //console.log(two_d[0][0]);
+
+         console.log('Multi domain USP schema detected');
+         from_cols = two_d.map(function(value,index) { return value[1]; });
+         //console.log('from_cols='+from_cols);
+         to_cols = two_d.map(function(value,index) { return value[3]; });
+         //console.log('to_cols='+to_cols);
+
+        } else {
+
+         //console.log('Single domain USP schema detected');
+         from_cols = two_d.map(function(value,index) { return value[0]; });
+         //console.log('from_cols='+from_cols);
+         to_cols = two_d.map(function(value,index) { return value[1]; });
+         //console.log('to_cols='+to_cols);
+
+        }
+
         //Find the uniques and assign them a position
         unique_from = Array.from(new Set(from_cols));
+        //console.log('unique_from='+unique_from);
+
         //Now we build the datatable array
         dt_cols = [{ title: 'From/To', width: 50, className: "ui-state-default sorting_disabled misc" }];
         dt_rows = [];
+
         //Array of column numbers 1->nz
         dt_render_cols = [];
         for (i=1; i<nz+1; i++) {
             //No need to get fancy, we already need to loop
             dt_render_cols.push(i);
             dt_cols.push({title: unique_from[i-1]});
+            console.log(dt_cols);
+
             row = Array(nz).fill('');
             row.unshift(unique_from[i-1]);
+            console.log(dt_rows);
             dt_rows.push(row);
+            console.log(dt_rows);
         }
+        //console.log('dt_cols='+dt_cols);
+        //console.log('dt_rows='+dt_rows);
+
         //Now all the rows
         two_d.forEach(function(item, index) {
             //Line up the row/col for entry
             //console.log(item);
-            row = unique_from.indexOf(item[1]);
-            col = unique_from.indexOf(item[3]) + 1;
-            //console.log(row,col);
-            temp_skel = usp_skel;
-            temp_skel.zonetype = zone_types.indexOf(item[5]) || 0;
-            temp_skel.severity = severity.indexOf(item[4]) || 0;
-            temp_skel.services = item[6];
-            temp_skel.flow_types = flow_types.indexOf(item[8]);
-            //No support for number fields, normalize with regex first
-            nr = item[7].replace(/\:\d+\}/g, ":X}");
-            temp_skel.rule_props = nr.split(";").map(function(value, index) { return rule_props.indexOf(value);});
-            dt_rows[row][col] = JSON.stringify(temp_skel);
 
+            if (header_row.length==9){
+             row = unique_from.indexOf(item[1]);
+             col = unique_from.indexOf(item[3]) + 1;
+            } else {
+             row = unique_from.indexOf(item[0]);
+             col = unique_from.indexOf(item[1]) + 1;
+            }
+            console.log('row='+row+' col='+col);
+
+            temp_skel = usp_skel;
+            temp_import_validation = 0;
+
+            if (header_row.length==9){
+             temp_skel.zonetype = zone_types.indexOf(item[5]) || 0;
+             temp_skel.severity = severity.indexOf(item[4]) || 0;
+             temp_skel.services = item[6];
+             temp_skel.flow_types = flow_types.indexOf(item[8]);
+             //No support for number fields, normalize with regex first
+             if ( typeof item[7] !== 'undefined'){
+               nr = item[7].replace(/\:\d+\}/g, ":X}");
+             }else{
+               temp_import_validation=1;
+               alert("Bad format!");
+             }
+            } else {
+             temp_skel.zonetype = zone_types.indexOf(item[3]) || 0;
+             temp_skel.severity = severity.indexOf(item[2]) || 0;
+             temp_skel.services = item[4];
+             temp_skel.flow_types = flow_types.indexOf(item[6]);
+             //No support for number fields, normalize with regex first
+             if ( typeof item[5] !== 'undefined'){
+               nr = item[5].replace(/\:\d+\}/g, ":X}");
+             }else{
+               temp_import_validation=1;
+               alert("Bad format!");
+             }
+            }
+            if (!temp_import_validation) {
+             temp_skel.rule_props = nr.split(";").map(function(value, index) { return rule_props.indexOf(value);});
+             dt_rows[row][col] = JSON.stringify(temp_skel);
+            }
         });
 
-        
+        if (!temp_import_validation) {
+          console.log("Importing " + nz + " Zones");
+          console.log("two_d="+two_d);
+          console.log("from_cols="+from_cols);
+          console.log("to_cols="+to_cols);
+          console.log("unique_from="+unique_from);
+          console.log("New Fill");
+          console.log("dt_render_cols="+dt_render_cols);
+          console.log("dt_cols="+dt_cols);
+          console.log("dt_rows="+dt_rows);
+        }
 
-        console.log("Importing " + nz + " Zones");
-        console.log(two_d);
-        console.log(from_cols);
-        console.log(to_cols);
-        console.log(unique_from);
-        console.log("New Fill");
-        console.log(dt_render_cols,dt_cols,dt_rows);
-        //Reinit
-        //init(dt_rows,dt_cols, dt_render_cols, false);
-        if (add_new) {
+        if (add_new && !temp_import_validation) {
             //Add a new zone while where at it
             new_name = 'New Zone ' + (nz+1);
             new_zone = new Array(nz).fill(JSON.stringify(usp_skel));
@@ -644,14 +839,41 @@ $(function() {
             console.log(dt_rows);
             dt_cols.push({title: new_name});
             //Fill in the blank zone
-            dt_rows.map(function(value, index) { return value.push(JSON.stringify(usp_skel));})            
+            dt_rows.map(function(value, index) { return value.push(JSON.stringify(usp_skel));})
             dt_render_cols.push(nz+1);
 
             }
+        if (!temp_import_validation){
+          init(dt_rows,dt_cols, dt_render_cols, false)
+        }
+    }
 
-        init(dt_rows,dt_cols, dt_render_cols, false)
+    function reset_usp(first=false){
+        //Create initial Data and column definition
+        col = [{ title: 'From/To', width: "100px", className: "ui-state-default sorting_disabled misc" }];
+        table_data = [];
+        cols = [];
 
-        
+        for(i=1; i < number_of_zones+1; i++) {
+            n = 'New Zone ' + (i);
+            col.push({title: n});
+            //Make a row default objects
+            row = Array(number_of_zones).fill(JSON.stringify(usp_skel));
+            //Prepend column index
+            row.unshift(n);
+            //Add to data arrays
+            table_data.push(row);
+            cols.push(i);
+        }
+        console.log("Original Fill");
+        console.log(cols);
+        console.log(col);
+        console.log(table_data);
+        //Go for it
+        ta = $("#output");
+        ta.val('');
+        $("#default_domain").val("Default");
+        init(table_data, col, cols, first);
     }
 
     //Loop through data cells and output csv into textarea
@@ -660,7 +882,7 @@ $(function() {
         ta = $("#output");
         ta.val('');
         ta.val(header);
-        domain = $("#default_domain").val();
+        domain = '\"'+$("#default_domain").val()+'\"';
         $('#uspgrid tr td:not(:first-child)').each(function(index, value) {
             //Start array that we'll join later
             r = [];
@@ -670,8 +892,8 @@ $(function() {
             //Parse the JSON out
             cd = JSON.parse(c.data());
             //Grab the zones based on cell
-            to = $(usp_table.column(this).header()).text();
-            from = $(usp_table.row(this).node()).find('td:eq(0)').text();
+            to = '\"'+$(usp_table.column(this).header()).text()+'\"';
+            from = '\"'+$(usp_table.row(this).node()).find('td:eq(0)').text()+'\"';
             //console.log("From:" + from + " To: " + to);
             //Start pushing
             r.push(domain,from,domain,to,severity[cd.severity], zone_types[cd.zonetype]);
@@ -688,8 +910,31 @@ $(function() {
             //console.log(r);
             //Output line
             ta.val(ta.val() + "\n" + r.join(","));
+        });
 
-        })
+        tb = $("#output2");
+        tb.val('');
+        tb.val(tb.val() + "#Zone Properties\nzone name,domain, is_shared, description\n");
+        $('#uspgrid tr td:first-child').each(function() {
+          z = $(this).text();
+          if (server_zones.indexOf(z) === -1) {
+            console.log("Exporting "+z+" from grid");
+            tb.val(tb.val() + z + "," + domain + ",," + z + "\n");
+          }
+        });
+        tb.val(tb.val() + ",,\n#Zone Hierarchy\nparent,child\n,,\n#Zone Subnets\nzone name,subnet,description\n");
+
+//#Zone Properties,,
+//zone name,domain, is_shared, description
+//local_zones[i]+','+domain+','+local_zones[i]
+//,,
+//#Zone Hierarchy
+//parent,child
+//,,
+//#Zone Subnets
+//zone name,subnet,description
+//,,
+
     }
 
 
@@ -702,8 +947,8 @@ $(function() {
         //Setup DataTables
         //Using a render to show ZoneType instead of JSON string.
         usp_table = $('#uspgrid').DataTable( {
-            //data: [['Zone 1', '', '',''],['Zone 2', '', '',''],['Zone 3','','','']],
-            //columns: [ { title: 'From/To', width: 50 }, {title: 'Zone 1', width: 200}, {title: 'Zone 2', width: 200}, {title: 'Zone 3', width: 200}],
+            //data: [['New Zone 1', '', '',''],['New Zone 2', '', '',''],['New Zone 3','','','']],
+            //columns: [ { title: 'From/To', width: 50 }, {title: 'New Zone 1', width: 200}, {title: 'New Zone 2', width: 200}, {title: 'New Zone 3', width: 200}],
             data: dt_rows,
             columns: dt_cols,
             "paging": false,
@@ -757,33 +1002,15 @@ $(function() {
             }
         });
 
+     make_csv();
+
     }
 
     var usp_table;
     var on_server = false;
     var services_available = [ "AOL", "AP-Defender", "AT-Defender", "BGP", "Citrix_ICA", "CP_Exnet_PK", "CP_Exnet_resolve", "CP_redundant", "CP_reporting", "CP_rtm", "CP_seam", "CP_SmartPortal", "CP_SSL_Network_Extender", "CPD", "CPD_amon", "CPMI", "daytime-tcp", "discard-tcp", "domain-tcp", "echo-tcp", "EDGE", "Entrust-Admin", "Entrust-KeyMgmt", "epmap-tcp", "exec", "FIBMGR", "finger", "ftp", "FW1", "FW1_amon", "FW1_clntauth_http", "FW1_clntauth_telnet", "FW1_CPRID", "FW1_cvp", "FW1_ela", "FW1_ica_mgmt_tools", "FW1_ica_pull", "FW1_ica_push", "FW1_ica_services", "FW1_key", "FW1_lea", "FW1_log", "FW1_mgmt", "FW1_netso", "FW1_omi", "FW1_omi-sic", "FW1_pslogon", "FW1_pslogon_NG", "FW1_sam", "FW1_sds_logon", "FW1_sds_logon_NG", "FW1_snauth", "FW1_topo", "FW1_uaa", "FW1_ufp", "gopher", "GoToMyPC", "H323", "http", "HTTP_and_HTTPS_proxy", "https", "ident", "IKE-tcp", "imap", "IMAP-SSL", "IPSO_Clustering_Mgmt_Protocol", "irc2", "Kerberos_v5_TCP", "ldap", "ldap-ssl", "login", "lotus", "lpdw0rm", "microsoft-ds", "MS-SQL-Monitor", "MS-SQL-Server", "MSNP", "MySQL", "nbsession", "NCP", "netshow", "netstat", "nfsd-tcp", "nntp", "ntp-tcp", "OAS-NameServer", "OAS-ORB", "pcANYWHERE-data", "pcTELECOMMUTE-FileSync", "pop-2", "pop-3", "POP3S", "PostgreSQL", "pptp-tcp", "RainWall_Command", "Real-Audio", "RealSecure", "Remote_Debug", "Remote_Desktop_Protocol", "rtsp", "SCCP", "securidprop", "shell", "sip_tls", "sip-tcp", "smtp", "SMTPS", "sqlnet1-2", "sqlnet2-1525", "sqlnet2-1526", "Squid_NTLM", "ssh", "StoneBeat-Control", "StoneBeat-Daemon", "T.120", "TACACSplus", "tcp-high-ports", "telnet", "time-tcp", "UserCheck", "uucp", "wais", "X11", "Yahoo_Messenger_messages", "Yahoo_Messenger_Voice_Chat_TCP", "Yahoo_Messenger_Webcams", "Service Name", "biff", "bootp", "Citrix_ICA_Browsing", "daytime-udp", "dhcp", "discard-udp", "domain-udp", "E2ECP", "echo-udp", "epmap-udp", "FW1_load_agent", "FW1_scv_keep_alive", "FW1_snmp", "H323_ras", "Hotline_tracker", "ICQ_locator", "IKE", "IKE_NAT_TRAVERSAL", "Kerberos_v5_UDP", "kerberos-udp", "L2TP", "ldap-udp", "MetaIP-UAT", "mgcp_CA", "mgcp_MG", "microsoft-ds-udp", "MS-SQL-Monitor_UDP", "MS-SQL-Server_UDP", "MSN_Messenger_1863_UDP", "MSN_Messenger_5190", "MSN_Messenger_Voice", "name", "nbdatagram", "nbname", "NEW-RADIUS-ACCOUNTING", "NEW-RADIUS-ACCOUNTING", "nfsd", "ntp-udp", "pcANYWHERE-stat", "RADIUS", "RADIUS-ACCOUNTING", "RainWall_Daemon", "RainWall_Status", "RainWall_Stop", "RDP", "rip", "RIPng", "securid-udp", "sip", "snmp", "SWTP_Gateway", "SWTP_SMS", "syslog", "TACACS", "tftp", "time-udp", "tunnel_test", "udp-high-ports", "VPN1_IPSEC_encapsulation", "wap_wdp", "wap_wdp_enc", "wap_wtp", "wap_wtp_enc", "who", "Service Name", "dest-unreach", "echo-reply", "echo-request", "info-reply", "info-req", "mask-reply", "mask-request", "param-prblm", "redirect", "source-quench", "time-exceeded", "timestamp", "timestamp-reply", "Service Name", "AH", "egp", "ESP", "FW1_Encapsulation", "ggp", "gre", "icmp-proto", "igmp", "igrp", "IP_Mobility", "ospf", "PIM", "SIT", "Sitara", "SKIP", "SUN_ND", "SWIPE", "vrrp"]; 
-    //Create initial Data and column definition
-    col = [{ title: 'From/To', width: "100px", className: "ui-state-default sorting_disabled misc" }];
-    table_data = [];
-    cols = [];
 
-    for(i=1; i < number_of_zones+1; i++) {
-        n = 'Zone ' + (i);
-        col.push({title: n});
-        //Make a row default objects
-        row = Array(number_of_zones).fill(JSON.stringify(usp_skel));
-        //Prepend column index
-        row.unshift(n);
-        //Add to data arrays
-        table_data.push(row);
-        cols.push(i);
-    }        
-    console.log("Original Fill");
-    console.log(cols);
-    console.log(col);
-    console.log(table_data);
-    //Go for it
-    init(table_data, col, cols);
+    reset_usp(true);
 
     //Make a tool tip to see entered data
     $( document ).tooltip({
@@ -795,7 +1022,8 @@ $(function() {
             idx = usp_table.row(this).index();
             from_z = usp_table.cell(idx,0).data();
             //
-            idx = usp_table.cell( this ).index().column;
+            //fix exception while moving mouse not over grid
+            if (typeof(usp_table.cell( this ).index()) !== 'undefined') idx = usp_table.cell( this ).index().column;
             e = usp_table.column(idx).header()
             if (idx === 0) {
                 return null
@@ -872,25 +1100,31 @@ $(function() {
     //Hide things
     $('#about').hide();
     $('#instructions').hide();
+    $('#top_usp_name').hide();
 
     if (document.location.href.includes('file://') || document.location.href.includes('codepen')){
         // We are offline. hide the things
         $("#online_menu_bar").hide();
         $("#online_selections").hide();
         $('#online').hide();
+	get_local_zones();
     } else {
         // online, load the things
         on_server = true;
         $("#get_usps").click();
+        $("#offline_menu_bar").hide();
         $('#offline').hide();
         $("#get_zones").click();
-        $('#server_zones').change(function() {
-            zone_name = $(this).find('option:selected').attr("value");
-            $("#zone_name").val(zone_name);
-        });
         import_exceptions();
 
     }
+    $('#zone_list').change(function() {
+     if ($(this).find('option:selected').attr("value")) {
+        zone_name = $(this).find('option:selected').attr("value");
+        $("#zone_name").val(zone_name);
+     }
+    });
+
 });
 
 //UI-Tagit https://github.com/aehlke/tag-it/
