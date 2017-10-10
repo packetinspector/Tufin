@@ -35,11 +35,11 @@ $ pip install pytos
 $ ./config-backup.py
 Fethching Devices...
 Getting config for RTR1-1
-Success!. Saving Config
+Success! Saving Config
 Getting config for SRX-5
-Success!. Saving Config
+Success! Saving Config
 Getting config for RTR2-7
-Success!. Saving Config
+Success! Saving Config
 Getting config for ASAv-8
 $ head -10 /tmp/tufin/RTR1-1.txt
 !
