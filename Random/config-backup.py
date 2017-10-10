@@ -30,7 +30,7 @@ for d in devices:
         print("Config failed for {}".format(filename))
         continue
 
-    print("Success!. Saving Config")
+    print("Success! Saving Config")
     c = bytes.decode(c)
     c.replace('\n',"\n")
     with open(confbackdir + filename + '.txt', 'w') as f:
