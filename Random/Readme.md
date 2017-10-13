@@ -28,7 +28,7 @@ Found Address Object. Name: 10.10.20.15 IP: 10.10.20.15
 Script will store most recent config from all devices
 Makes use of pytos
 ```
-$ pip install pytos
+$ pip3 install pytos
 ```
 
 ```bash
