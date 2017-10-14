@@ -10,7 +10,7 @@ t_pass = '<PASS>'
 
 # No edit past here...
 st_helper = Secure_Track_Helper(t_ip, (t_user, t_pass))
-print("Fethching Devices...")
+print("Fetching Devices...")
 try:
     devices = st_helper.get_devices_list()
 except:
