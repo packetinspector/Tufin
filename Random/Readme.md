@@ -33,7 +33,7 @@ $ pip3 install pytos
 
 ```bash
 $ ./config-backup.py
-Fethching Devices...
+Fetching Devices...
 Getting config for RTR1-1
 Success! Saving Config
 Getting config for SRX-5
