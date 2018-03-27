@@ -181,4 +181,4 @@ for s in sgs:
     sh = 'NSX_' + s
     create_pattern(zones[sh], s)
 upload_usp(make_usp(sgs_with_prefix), 'USP_NSX_' + str(int(round(time.time()))))
-print "You USP is uploaded"
+print "Your USP is uploaded"
