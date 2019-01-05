@@ -5,11 +5,11 @@ Demonstration of Tufin API.  Decommission(remove/disable) a rule from an interac
 
 In Action
 ---------
-![ScreenShot](https://raw.githubusercontent.com/packetinspector/Tufin/master//images/decom-anim.gif)
+![ScreenShot](https://raw.githubusercontent.com/packetinspector/Tufin/SecureChange-CLI Rule Decom/images/decom-anim.gif)
 
 Result
 ---------
-![ScreenShot](https://raw.githubusercontent.com/packetinspector/Tufin/master//images/sc_result.png)
+![ScreenShot](https://raw.githubusercontent.com/packetinspector/Tufin/SecureChange-CLI Rule Decom/images/sc_result.png)
 
 Instructions
 ---------
